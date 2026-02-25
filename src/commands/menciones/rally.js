@@ -3,6 +3,7 @@ const path = require('path')
 
 module.exports = {
   name: 'rally',
+  keywords: ['objetivo', 'target', 'rallys'],
   admin: false, // 🔒 recomendado
 
   execute: async (sock, msg) => {

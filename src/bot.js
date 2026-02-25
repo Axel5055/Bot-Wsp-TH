@@ -4,7 +4,8 @@ require('dotenv').config()
 const {
   default: makeWASocket,
   useMultiFileAuthState,
-  DisconnectReason
+  DisconnectReason,
+  fetchLatestBaileysVersion
 } = require('@whiskeysockets/baileys')
 
 const Pino = require('pino')
@@ -19,27 +20,34 @@ const setupAutoWelcome = require('./handlers/welcome.handler')
 // 🦊 SoNy handler
 const initSony = require('./handlers/sony.handler')
 
-const { initTelegramClient } = require('./telegram/telegram.client')
-const { registerTelegramEvents } = require('./telegram/telegram.events')
-
-let telegramStarted = false // ⛔ evita iniciar Telegram 2 veces
+// 🌍 Traducción por reacción
+const initTranslateReaction = require('./handlers/translate.reaction')
 
 async function startBot() {
+  console.log('🚀 Iniciando bot...')
+
   const { state, saveCreds } = await useMultiFileAuthState('src/sessions')
+  const { version } = await fetchLatestBaileysVersion()
 
   const sock = makeWASocket({
+    version,
     auth: state,
-    logger: Pino({ level: 'silent' })
+    logger: Pino({ level: 'silent' }),
+    browser: ['SoNy Bot', 'Chrome', '1.0.0']
   })
 
   sock.ev.on('creds.update', saveCreds)
 
-  // ✅ Registrar bienvenida automática (UNA SOLA VEZ)
+  // ✅ Registrar bienvenida automática
   setupAutoWelcome(sock)
+
+  // 🌍 Activar traducción por bandera
+  initTranslateReaction(sock)
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update
 
+    // 🔥 Mostrar QR correctamente
     if (qr) {
       console.log('\n📲 Escanea este QR con WhatsApp\n')
       qrcode.generate(qr, { small: true })
@@ -61,27 +69,26 @@ async function startBot() {
       } catch (err) {
         console.error('❌ Error al iniciar SoNy:', err)
       }
-
-      if (!telegramStarted) {
-        telegramStarted = true
-        console.log('🚀 Iniciando conexión con Telegram...')
-      
-        const tgClient = await initTelegramClient()
-        registerTelegramEvents(tgClient, sock)
-      
-        console.log('✅ Telegram integrado correctamente')
-      }
     }
 
     if (connection === 'close') {
-      const reason = lastDisconnect?.error?.output?.statusCode
+      const statusCode =
+        lastDisconnect?.error?.output?.statusCode ||
+        lastDisconnect?.error?.statusCode
 
-      if (reason !== DisconnectReason.loggedOut) {
-        startBot()
+      console.log('❌ Conexión cerrada. Código:', statusCode)
+
+      // 🔥 SI ES LOGOUT (405) NO RECONECTAR
+      if (statusCode === DisconnectReason.loggedOut) {
+        console.log('⚠️ Sesión cerrada. Borra src/sessions y reinicia el bot.')
+      } else {
+        console.log('🔄 Reconectando en 3 segundos...')
+        setTimeout(() => startBot(), 3000)
       }
     }
   })
 
+  // 📩 Handler principal de mensajes
   startMessageHandler(sock)
 }
 

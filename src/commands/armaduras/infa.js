@@ -3,6 +3,7 @@ const fs = require('fs')
 
 module.exports = {
   name: 'infa',
+  keywords: ['infanteria'],
   admin: false,
   execute: async (sock, msg) => {
     const imagePath = path.join(

@@ -11,6 +11,7 @@ function shuffleArray(array) {
 module.exports = {
   name: 'topgay',
   admin: false,
+  keywords: ['top gay'],
 
   execute: async (sock, msg) => {
     const chatId = msg.key.remoteJid

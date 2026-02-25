@@ -3,7 +3,7 @@ const { getSheet } = require('../../cache/excelCache')
 
 module.exports = {
   name: 'avisos',
-  admin: true, // 👈 isadmin se encarga
+  admin: true,
 
   async execute(sock, msg) {
     const chatId = msg.key.remoteJid
@@ -13,7 +13,6 @@ module.exports = {
         text: '📢 Enviando avisos...',
       })
 
-      // 🧠 Hoja desde cache (por nombre)
       const sheet = getSheet('Avisos')
 
       if (!sheet) {
@@ -30,6 +29,19 @@ module.exports = {
           text: '*⚠️ No hay registros en la hoja "Avisos".*',
         })
         return
+      }
+
+      // 🔎 Obtener encabezados
+      const headers = Object.keys(data[0])
+
+      // Buscar la columna "Puntos x cumplir"
+      const indexPuntosCumplir = headers.indexOf('Puntos x cumplir')
+
+      // Todas las columnas después de esa serán historial
+      let columnasHistorial = []
+
+      if (indexPuntosCumplir !== -1) {
+        columnasHistorial = headers.slice(indexPuntosCumplir + 1)
       }
 
       for (const u of data) {
@@ -49,14 +61,38 @@ module.exports = {
         }
 
         const meta = 35
-        const debe = u.Debe || 0
-        const total = meta + debe
+        const debeActual = Number(u.Debe) || 0
+
+        // 📂 Construir historial de deudas (>0)
+        let historialDeuda = ''
+        let deudaAnteriorTotal = 0
+
+        for (const columna of columnasHistorial) {
+          const valor = Number(u[columna]) || 0
+
+          if (valor > 0) {
+            historialDeuda += `📂 ${columna}: ${valor} puntos\n`
+            deudaAnteriorTotal += valor
+          }
+        }
+
+        // 🔥 TOTAL REAL
+        const total = meta + debeActual + deudaAnteriorTotal
+
+        // 🔥 Bloque de deudas anteriores
+        let bloqueDeudas = ''
+
+        if (deudaAnteriorTotal > 0) {
+          bloqueDeudas = `📜 *Deudas anteriores:*\n${historialDeuda}`
+        } else {
+          bloqueDeudas = `📜 *Deudas anteriores:* Ninguna`
+        }
 
         const texto = `📢 *Aviso de Cacería* 📢
 
 👋 ¡Hola, *${u.Nombre}*! 👋
 
-⚠️ Tu *status* esta semana fue: ❌ *NO CUMPLIÓ*  
+⚠️ Tu *status* esta semana fue: ❌ *NO CUMPLIÓ*
 
 🎯 *Tipo de Caza:* ${tipo}
 🎯 *Total de Caza Semanal:* ${u['Total Semanal'] || 0} Mobs
@@ -69,11 +105,13 @@ module.exports = {
 🔹 *L4*: ${u.Mob4 || 0} Mobs 🐧
 🔹 *L5*: ${u.Mob5 || 0} Mobs 🐯
 
-❌ Te faltaron *${debe} puntos* para llegar a la meta mínima de *${meta}*.
+❌ Esta semana quedaste debiendo *${debeActual} puntos*.
 
-📌 Recuerda que tienes *1 semana para reponer esos ${debe} puntos* más los ${meta} de la nueva semana.
+${bloqueDeudas}
 
-➡️ En total deberás cumplir: *${total} puntos*.
+📌 Recuerda que debes cumplir la meta semanal más tu deuda acumulada.
+
+🎯 *Total a cumplir esta semana: ${total} puntos.*
 
 🅣🅗 ​- ​🅑🅞🅣`
 
@@ -83,8 +121,9 @@ module.exports = {
       }
 
       await sock.sendMessage(chatId, {
-        text: '✅ *Avisos enviados a todos los jugadores con status "No Cumplió".*',
+        text: '✅ *Avisos enviados correctamente.*',
       })
+
     } catch (error) {
       console.error('❌ Error en comando /avisos:', error)
 

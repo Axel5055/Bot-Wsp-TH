@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-  name: 'imagen',
+  name: 'calendario',
   admin: false,
   execute: async (sock, msg) => {
     await sock.sendMessage(msg.key.remoteJid, {

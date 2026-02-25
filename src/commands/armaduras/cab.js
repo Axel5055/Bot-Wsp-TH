@@ -2,7 +2,8 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = {
-  name: 'infa',
+  name: 'cab',
+  keywords: ['caballos', 'caballeria'],
   admin: false,
   execute: async (sock, msg) => {
     const imagePath = path.join(

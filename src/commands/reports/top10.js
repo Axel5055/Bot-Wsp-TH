@@ -4,6 +4,7 @@ const { getRandomIcono } = require('../../utils/caceriaUtils')
 
 module.exports = {
   name: 'top10',
+  keywords: ['top 10'],
   admin: false,
 
   async execute(sock, msg) {

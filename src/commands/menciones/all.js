@@ -54,7 +54,7 @@ module.exports = {
       })
 
     } catch (error) {
-      console.error('❌ Error en comando /all:', error)
+      console.error('❌ Error en comando #all:', error)
       await sock.sendMessage(chatId, {
         text: '❌ Ocurrió un error ejecutando el comando.'
       })

@@ -2,8 +2,10 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = {
-  name: 'infa',
+  name: 'mix',
   admin: false,
+  keywords: ['mixto', 'mixs'],
+
   execute: async (sock, msg) => {
     const imagePath = path.join(
       __dirname,

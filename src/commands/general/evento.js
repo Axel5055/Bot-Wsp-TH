@@ -76,9 +76,10 @@ Del 2 de Febrero al 1 de Marzo del 2026
 Cumplir semanalmente con la cacería sin fallar para participar en la rifa.
 
 🗳️ *Participan:*  
-Todos los que cumplan las reglas del mes
+Todos los que cumplan las semanas del mes de Febrero
 
-🔥 Cada cazador que cumpla obtiene un boleto para la rifa.
+🔥 Cada cazador que cumpla con el objetivo semanal obtendrá un boleto para la rifa.
+Para conseguir más entradas, se tomará en cuenta el excedente de cacería: por cada 5 mobs adicionales a los 35 base, se otorgará un boleto extra.
 
 📘 Consulta las reglas con: */caza*
 

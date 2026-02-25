@@ -4,6 +4,7 @@ const { getText, normalizarTexto } = require('../../utils/caceriaUtils')
 
 module.exports = {
   name: 'stats',
+  keywords: ['stats', 'estadisticas'],
   admin: false,
 
   async execute(sock, msg) {

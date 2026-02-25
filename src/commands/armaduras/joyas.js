@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = {
-  name: 'infa',
+  name: 'joyas',
   admin: false,
   execute: async (sock, msg) => {
     const imagePath = path.join(

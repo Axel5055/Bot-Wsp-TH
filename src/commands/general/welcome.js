@@ -3,6 +3,7 @@ const path = require('path')
 
 module.exports = {
   name: 'welcome',
+  keywords: ['bienvenida', 'bienvenido'],
   admin: true,
 
   execute: async (sock, msg) => {

@@ -14,7 +14,7 @@
   "pantera": {
     "nombreDado": "Pantera",
     "ids": "559847999, 778540928, 817770675, 1044220425",
-    "nombresDeCuentas": "KLEY HT2, Ladie Jeni, PANTER NGRA, Sh4dow5",
+    "nombresDeCuentas": "PANTER NGRA, Sh4dow5",
     "ownerId": "239599347597423@lid"
   },
   "tom": {
@@ -25,26 +25,26 @@
   },
   "toxic": {
     "nombreDado": "Toxic",
-    "ids": "469677437, 658843231, 919665444, 1913187635, 1915163097, 1917368618, 1923743214, 2024927090",
-    "nombresDeCuentas": "Atlas7770, Faker TH, MiniFaker TH, TH Anteiku, TH Faker, TH NotLife, TH xJokerx, xJokerx TH",
+    "ids": "658843231, 919665444, 1913187635, 1915163097, 1917368618, 1923743214, 1940642101, 2024927090, 2057192192, 2060348531",
+    "nombresDeCuentas": "Atlas7770, Hotspot 2, MiniFaker TH, NotLife2, tetona, TH Anteiku, TH Faker, TH NotLife, TH xJokerx, xJokerx TH",
     "ownerId": "278391760654361@lid"
   },
   "mei": {
     "nombreDado": "Mei",
     "ids": "1327183228, 1371120004, 545632943, 651360013, 666840720",
-    "nombresDeCuentas": "ARANDANITO, DAMASQUITO, FRUTOSECO, FRUTOSROJOS, GUINDITA",
+    "nombresDeCuentas": "xXAfrodltaXx, xXPersefon3X",
     "ownerId": "167388230209694@lid"
-  },
-  "nico": {
-    "nombreDado": "Nico",
-    "ids": "582278789, 999874043",
-    "nombresDeCuentas": "LOBO70, N I C O TH",
-    "ownerId": "193978557317196@lid"
   },
   "david": {
     "nombreDado": "David",
     "ids": "723725687, 874666931",
     "nombresDeCuentas": "FALCON221, yoshi tecojo",
     "ownerId": "82850439290899@lid"
+  },
+  "dylan": {
+    "nombreDado": "Dylan",
+    "ids": "829026210, 829081229, 829088153, 940947273",
+    "nombresDeCuentas": "Dpoolll, EL PAPY RAY, ReySparta, TH Badboys3",
+    "ownerId": "183692110602327@lid"
   }
 }

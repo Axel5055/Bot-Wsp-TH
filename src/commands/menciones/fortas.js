@@ -70,7 +70,7 @@ module.exports = {
       )
 
     } catch (error) {
-      console.error('❌ Error en comando /forta:', error)
+      console.error('❌ Error en comando #forta:', error)
       await sock.sendMessage(chatId, {
         text: '❌ Ocurrió un error ejecutando el comando.'
       })
