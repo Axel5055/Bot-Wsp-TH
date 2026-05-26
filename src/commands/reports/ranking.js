@@ -1,29 +1,9 @@
+'use strict'
+
 const xlsx = require('xlsx')
 const moment = require('moment-timezone')
-const fs = require('fs')
-const path = require('path')
 const { getRandomIcono } = require('../../utils/caceriaUtils')
 const { getSheet } = require('../../cache/excelCache')
-
-// 📁 Ruta del modo del evento
-const modoPath = path.join(
-  __dirname,
-  '../../data/modo_evento.json'
-)
-
-// 🔎 Leer modo actual del evento
-function getModoEvento() {
-  if (!fs.existsSync(modoPath)) {
-    return { modo: 1 }
-  }
-
-  try {
-    return JSON.parse(fs.readFileSync(modoPath, 'utf-8'))
-  } catch (error) {
-    console.error('❌ Error leyendo modo_evento.json:', error)
-    return { modo: 1 }
-  }
-}
 
 module.exports = {
   name: 'ranking',
@@ -33,61 +13,44 @@ module.exports = {
     const chatId = msg.key.remoteJid
 
     try {
-      // 🔥 Excel desde memoria
-      const sheet = getSheet(3)
+      await sock.sendMessage(chatId, { react: { text: '🏆', key: msg.key } })
 
+      const sheet = getSheet(3)
       if (!sheet) {
-        await sock.sendMessage(chatId, {
-          text: '*⚠️ No se encontró la hoja de ranking.*',
-        })
+        await sock.sendMessage(chatId, { text: '⚠️ No se encontró la hoja de ranking en el Excel.' })
         return
       }
 
       const data = xlsx.utils.sheet_to_json(sheet)
-
-      const top = data
-        .sort((a, b) => (b.Total || 0) - (a.Total || 0))
-        .slice(0, 10)
-
-      const mes = sheet['J1']?.v || 'Mes desconocido'
-      const year = moment().tz('America/Mexico_City').format('YYYY')
-      const medals = ['🥇','🥈','🥉','🏅','🏅','🏅','🏅','🏅','🏅','🏅']
-
-      // 🔎 Obtener modo del evento actual
-      const { modo } = getModoEvento()
-
-      let txt = `🏆 *¡Ranking de los 10 Mejores Cazadores del Mes!* 🏆\n\n`
-
-      top.forEach((u, i) => {
-        txt += `${i + 1}. ${medals[i]} *${u.Nombre}:* ${u.Total || 0} Pts ${getRandomIcono()}\n`
-      })
-
-      // 🔥 Mensaje dinámico según modo
-      if (modo === 1) {
-        txt += `\n🌟 *El mejor cazador del mes podrá elegir entre:*\n`
-        txt += `- *499 Diamantes*\n`
-        txt += `- *1 Full Bank*\n`
-        txt += `- *100K de Gemas*\n\n`
-      } else {
-        txt += `\n🎟️ *Este mes el evento es modalidad RIFA de cazadores.*\n`
-        txt += `🔥 Cada cazador que cumpla con el objetivo semanal obtendrá un boleto para la rifa.\n`
-        txt += `🎁 Premio a elegir:\n`
-        txt += `- *499 Diamantes*\n`
-        txt += `- *1 Full Bank*\n`
-        txt += `- *100K de Gemas*\n\n`
+      if (!data.length) {
+        await sock.sendMessage(chatId, { text: '⚠️ No hay datos en la hoja de ranking.' })
+        return
       }
 
-      txt += `📘 Consulta las bases con el comando: *#evento*\n\n`
-      txt += `*Evento de Cacería - Mes de ${mes} ${year}*\n`
-      txt += `\n🔥 ¡Sigan cazando y demostrando su habilidad! 💪\n\n🅣🅗 — 🅑🅞🅣`
+      const top    = data.sort((a, b) => (b.Total || 0) - (a.Total || 0)).slice(0, 10)
+      const mes    = sheet['J1']?.v || 'Mes actual'
+      const year   = moment().tz('America/Mexico_City').format('YYYY')
+      const medals = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟']
+
+      let txt = `━━━━━━━━━━━━━━━━━━━━━━━\n`
+      txt    += `🏆 *TOP 10 CAZADORES DEL MES*\n`
+      txt    += `📅 *${mes} ${year}*\n`
+      txt    += `━━━━━━━━━━━━━━━━━━━━━━━\n`
+
+      top.forEach((u, i) => {
+        txt += `${medals[i]} *${u.Nombre}* — ${u.Total || 0} pts ${getRandomIcono()}\n`
+      })
+
+      txt += `━━━━━━━━━━━━━━━━━━━━━━━\n`
+      txt += `🔥 ¡Sigan cazando y demostrando su habilidad! 💪\n\n`
+      txt += `💡 Consulta tus stats con *#stats [nick]*\n\n`
+      txt += `🅣🅗 — 🅑🅞🅣`
 
       await sock.sendMessage(chatId, { text: txt })
 
     } catch (error) {
-      console.error('❌ Error en /ranking:', error)
-      await sock.sendMessage(chatId, {
-        text: '⚠️ Error ejecutando ranking.',
-      })
+      console.error('❌ Error en ranking:', error)
+      await sock.sendMessage(chatId, { text: '⚠️ Ocurrió un error al ejecutar el comando. Intenta de nuevo.' })
     }
   },
 }

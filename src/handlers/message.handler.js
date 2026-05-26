@@ -1,33 +1,52 @@
 // message.handler.js
+// ✅ OPTIMIZADO: caché de metadatos de grupo, no hace llamada de red por cada mensaje
+
 const commandHandler = require('./command.handler')
 const triggers = require('../triggers')
 const chalk = require('chalk').default
 
+// ─────────────────────────────────────────────
+// 🗂️ Caché de nombres de grupo (evita llamadas repetidas)
+// ─────────────────────────────────────────────
+const groupNameCache = new Map()
+const GROUP_CACHE_TTL = 10 * 60 * 1000 // 10 minutos
+
+async function getGroupName(sock, remoteJid) {
+  const cached = groupNameCache.get(remoteJid)
+  if (cached && Date.now() - cached.ts < GROUP_CACHE_TTL) {
+    return cached.name
+  }
+
+  try {
+    const metadata = await sock.groupMetadata(remoteJid)
+    const name = metadata.subject || 'Grupo desconocido'
+    groupNameCache.set(remoteJid, { name, ts: Date.now() })
+    return name
+  } catch {
+    return 'Grupo desconocido'
+  }
+}
+
+// ─────────────────────────────────────────────
+// 📩 Handler principal
+// ─────────────────────────────────────────────
 module.exports = (sock) => {
   sock.ev.on('messages.upsert', async ({ messages, type }) => {
     if (type !== 'notify') return
 
     const msg = messages[0]
-    if (!msg.message) return
+    if (!msg?.message) return
     if (msg.key.fromMe) return
     if (msg.key.remoteJid === 'status@broadcast') return
 
-    // 🔥 IGNORAR SOLO MENSAJES INTERNOS
-    if (
-      msg.message.protocolMessage ||
-      msg.message.reactionMessage ||
-      msg.message.senderKeyDistributionMessage
-    ) {
-      return
-    }
+    // 🔇 Ignorar mensajes internos del protocolo
+    const { protocolMessage, reactionMessage, senderKeyDistributionMessage } = msg.message
+    if (protocolMessage || reactionMessage || senderKeyDistributionMessage) return
 
     const remoteJid = msg.key.remoteJid
     const isGroup = remoteJid.endsWith('@g.us')
 
-    // =========================
-    // 🔎 DETECCIÓN DE MENSAJE
-    // =========================
-
+    // ─── Extraer texto del mensaje ───
     const messageContent = msg.message
     const messageType = Object.keys(messageContent)[0]
 
@@ -38,110 +57,59 @@ module.exports = (sock) => {
       messageContent.videoMessage?.caption ||
       ''
 
-    // Si no hay texto ni media relevante, salir
-    if (!textMessage && !['imageMessage','videoMessage','audioMessage','stickerMessage'].includes(messageType)) {
-      return
-    }
+    const isMedia = ['imageMessage', 'videoMessage', 'audioMessage', 'stickerMessage'].includes(messageType)
 
-    // =========================
-    // 👤 USUARIO
-    // =========================
+    if (!textMessage && !isMedia) return
 
+    // ─── Datos del remitente ───
     const senderJid = msg.key.participant || msg.key.remoteJid
     const senderNumber = senderJid.split('@')[0]
     const senderName = msg.pushName || 'Desconocido'
 
-    // =========================
-    // 👥 GRUPO
-    // =========================
-
+    // ─── Datos del grupo (con caché) ───
     let groupName = 'Privado'
     let groupId = 'N/A'
 
     if (isGroup) {
       groupId = remoteJid
-      try {
-        const metadata = await sock.groupMetadata(remoteJid)
-        groupName = metadata.subject
-      } catch {
-        groupName = 'Grupo desconocido'
-      }
+      groupName = await getGroupName(sock, remoteJid)
     }
 
-    // =========================
-    // 🧠 MENSAJE RESUMIDO
-    // =========================
-
-    let messagePreview = ''
+    // ─── Preview para el log ───
     const MAX_LENGTH = 80
+    let messagePreview = ''
 
     if (textMessage) {
-      if (textMessage.length > MAX_LENGTH) {
-        messagePreview = chalk.yellow('[ MENSAJE LARGO ]')
-      } else {
-        messagePreview = chalk.white(textMessage)
-      }
+      messagePreview = textMessage.length > MAX_LENGTH
+        ? chalk.yellow('[ MENSAJE LARGO ]')
+        : chalk.white(textMessage)
     } else {
-      switch (messageType) {
-        case 'imageMessage':
-          messagePreview = chalk.cyan('[ IMAGEN ]')
-          break
-        case 'audioMessage':
-          messagePreview = chalk.magenta('[ AUDIO ]')
-          break
-        case 'stickerMessage':
-          messagePreview = chalk.green('[ STICKER ]')
-          break
-        case 'videoMessage':
-          messagePreview = chalk.blue('[ VIDEO ]')
-          break
-        default:
-          return
+      const previews = {
+        imageMessage:   chalk.cyan('[ IMAGEN ]'),
+        audioMessage:   chalk.magenta('[ AUDIO ]'),
+        stickerMessage: chalk.green('[ STICKER ]'),
+        videoMessage:   chalk.blue('[ VIDEO ]'),
       }
+      messagePreview = previews[messageType]
+      if (!messagePreview) return
     }
 
-    // =========================
-    // 🖥️ LOG EN CONSOLA
-    // =========================
+    // ─── Log en consola ───
+    console.log(chalk.bold('\n📩 NUEVO MENSAJE'))
+    console.log(chalk.gray('────────────────────────────'))
+    console.log(chalk.blue('👥 Grupo:'),   chalk.white(groupName))
+    console.log(chalk.blue('🆔 ID:'),      chalk.white(groupId))
+    console.log(chalk.green('📞 Número:'), chalk.white(senderNumber))
+    console.log(chalk.green('👤 Usuario:'),chalk.white(senderName))
+    console.log(chalk.yellow('💬 Msg:'),   messagePreview)
+    console.log(chalk.gray('────────────────────────────\n'))
 
-    console.log(chalk.bold('\n📩 NUEVO MENSAJE DETECTADO'))
-    console.log(chalk.gray('────────────────────────────────'))
-
-    console.log(
-      chalk.blue('👥 Grupo:'),
-      chalk.white(groupName)
-    )
-
-    console.log(
-      chalk.blue('🆔 ID Grupo:'),
-      chalk.white(groupId)
-    )
-
-    console.log(
-      chalk.green('📞 Número:'),
-      chalk.white(senderNumber)
-    )
-
-    console.log(
-      chalk.green('👤 Usuario:'),
-      chalk.white(senderName)
-    )
-
-    console.log(
-      chalk.yellow('💬 Mensaje:'),
-      messagePreview
-    )
-
-    console.log(chalk.gray('────────────────────────────────\n'))
-
-    // =========================
-    // ⚙️ LÓGICA DEL BOT
-    // =========================
-
+    // ─── Lógica del bot ───
     await commandHandler(sock, msg, textMessage)
 
-    for (const trigger of triggers) {
-      await trigger(sock, msg, textMessage)
-    }
+    // Ejecutar triggers en paralelo (más rápido, fallos aislados)
+    await Promise.allSettled(
+      triggers.map(trigger => trigger(sock, msg, textMessage))
+    )
   })
 }

@@ -1,89 +1,146 @@
+// commands/reports/buscar.js
+// Comando: #buscar <nombre>
+// Muestra el perfil completo de un miembro:
+//   - Estado de la semana actual (Stats)
+//   - Total acumulado del mes (Ranking Evento)
+// Ejemplo: #buscar ZOOMBI3XX
+
 const xlsx = require('xlsx')
 const { getSheet } = require('../../cache/excelCache')
-const { getText, normalizarTexto } = require('../../utils/caceriaUtils')
+
+const META_SEMANAL = 35
+
+function normalizar(texto = '') {
+  return String(texto)
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+function getPuntos(u) {
+  const cuota = String(u['Cuota'] ?? '').toLowerCase()
+  if (cuota.includes('5lvl2')) return Number(u['Puntos Nvl 2'] ?? 0)
+  if (cuota.includes('5lvl1')) return Number(u['Puntos Nvl 1'] ?? 0)
+  return Math.max(Number(u['Puntos Nvl 2'] ?? 0), Number(u['Puntos Nvl 1'] ?? 0))
+}
+
+function barra(puntos, meta = META_SEMANAL) {
+  const bloques = 8
+  const llenos  = Math.min(bloques, Math.floor((puntos / meta) * bloques))
+  return `[${'█'.repeat(llenos)}${'░'.repeat(bloques - llenos)}]`
+}
 
 module.exports = {
   name: 'stats',
-  keywords: ['stats', 'estadisticas'],
   admin: false,
 
-  async execute(sock, msg) {
+  async execute(sock, msg, args) {
     const chatId = msg.key.remoteJid
-    const body = getText(msg).trim()
-    const nombre = body.substring(6).trim()
 
-    if (!nombre) {
-      await sock.sendMessage(chatId, {
-        text: '*⚠️ Proporciona un nombre para buscar. Ejemplo: /stats Juan Pérez*',
+    if (!args || args.length === 0) {
+      return sock.sendMessage(chatId, {
+        text: '⚠️ Debes indicar un nombre.\n\nEjemplo: *#buscar ZOOMBI3XX*',
       })
-      return
     }
 
+    const nombreBuscado = args.join(' ').trim()
+
     try {
-      // 🦊 reacción opcional
       await sock.sendMessage(chatId, {
-        react: { text: '🦊', key: msg.key },
+        react: { text: '🔎', key: msg.key },
       })
 
-      // 🧠 hoja de estadísticas individuales (índice 0)
-      const sheet = getSheet(0)
+      // ── Stats: semana actual ─────────────────────────────────────
+      const sheetStats = getSheet(0)
+      const dataStats  = xlsx.utils.sheet_to_json(sheetStats)
 
-      if (!sheet) {
-        await sock.sendMessage(chatId, {
-          text: '*⚠️ No se encontró la hoja de estadísticas.*',
-        })
-        return
-      }
-
-      const data = xlsx.utils.sheet_to_json(sheet)
-      const fechaReporte = sheet['M2']?.v || 'Fecha desconocida'
-
-      const u = data.find(
-        r => normalizarTexto(r.Nombre) === normalizarTexto(nombre)
+      const u = dataStats.find(
+        r => normalizar(r['Nombre']) === normalizar(nombreBuscado)
       )
 
       if (!u) {
-        await sock.sendMessage(chatId, {
-          text: `*⚠️ No se encontraron estadísticas para "${nombre}".*`,
+        return sock.sendMessage(chatId, {
+          text:
+            `❌ No se encontró a *"${nombreBuscado}"*.\n\n` +
+            `Verifica que el nombre esté escrito igual que en el Excel.\n` +
+            `💡 Tip: respeta mayúsculas/minúsculas como aparece en el grupo.`,
         })
-        return
       }
 
-      const statusIcon = u.Status === 'Cumplio' ? '✅' : '❌'
-      let tipo = 'General'
-      let puntos = u.Puntos || 0
+      const puntos      = getPuntos(u)
+      const cumplio     = String(u['Status'] ?? '').trim() === 'Cumplio'
+      const statusIcono = cumplio ? '✅' : '❌'
+      const cuotaTipo   = String(u['Cuota'] ?? '').toLowerCase().includes('5lvl1') ? 'Nvl 1' : 'Nvl 2'
+      const fechaSemana = dataStats[0]['Fecha de Reporte'] || 'Semana actual'
+      const leFaltan    = Math.max(0, META_SEMANAL - puntos)
 
-      if (u.Cuota?.includes('5lvl2')) {
-        tipo = 'Nivel 2'
-        puntos = u['Puntos Nvl 2'] || 0
-      } else if (u.Cuota?.includes('5lvl1')) {
-        tipo = 'Nivel 1'
-        puntos = u['Puntos Nvl 1'] || 0
+      // ── Ranking Evento: total del mes ────────────────────────────
+      const sheetRank = getSheet(3)
+      const rawRank   = xlsx.utils.sheet_to_json(sheetRank, { header: 1 })
+
+      const headerRank = rawRank[0]
+      const idxTotal   = headerRank.findIndex(
+        c => String(c ?? '').toLowerCase() === 'total'
+      )
+      const mesNombre  = String(headerRank[headerRank.length - 1] ?? '')
+
+      const filaRank   = rawRank.slice(1).find(
+        row => normalizar(row[2]) === normalizar(u['Nombre'])
+      )
+
+      const totalMes   = filaRank && idxTotal !== -1
+        ? Number(filaRank[idxTotal] ?? 0)
+        : null
+
+      const posicion   = filaRank ? Number(filaRank[0]) : null
+
+      // ── Construir mensaje ────────────────────────────────────────
+      let txt = `🔎 *Perfil de Cazador*\n`
+      txt += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`
+
+      txt += `👤 *${u['Nombre']}*\n`
+      txt += `🎯 Cuota: *${cuotaTipo}*\n`
+      if (u['IGG ID']) txt += `🆔 IGG ID: \`${u['IGG ID']}\`\n`
+      txt += `\n`
+
+      // Semana actual
+      txt += `📅 *Semana actual* _(${fechaSemana})_\n`
+      txt += `${statusIcono} Status: *${cumplio ? 'Cumplió' : 'No cumplió'}*\n`
+      txt += `${barra(puntos)} *${puntos}/${META_SEMANAL}* pts\n`
+
+      if (!cumplio) {
+        txt += `⚠️ Le faltan *${leFaltan} pts* para cumplir\n`
       }
 
-      const txt = `👋 ¡Hola, *${u.Nombre}*! 👋
-Aquí están tus *Estadísticas de Cacería* 🤩
+      txt += `\n`
+      txt += `🏹 Mobs cazados: *${u['Total Semanal'] ?? 0}*\n`
+      txt += `🐰 L1: ${u['Total Mobs lvl 1'] ?? 0}  `
+      txt += `🐺 L2: ${u['Total Mobs lvl 2'] ?? 0}  `
+      txt += `🐲 L3: ${u['Total Mobs lvl 3'] ?? 0}\n`
+      txt += `🐧 L4: ${u['Total Mobs lvl 4'] ?? 0}  `
+      txt += `🐯 L5: ${u['Total Mobs lvl 5'] ?? 0}\n`
 
-🎯 *Tipo de Caza:* ${tipo}
-🎯 *Total de Caza Semanal:* ${u['Total Semanal'] || 0} Mobs
-🧮 *Total de Puntos:* ${puntos} Puntos
-*Status:* ${u.Status} ${statusIcon}
+      // Total del mes (si está en Ranking)
+      if (totalMes !== null) {
+        txt += `\n`
+        txt += `🗓️ *Mes de ${mesNombre}*\n`
+        txt += `🏆 Puntos acumulados: *${totalMes} pts*\n`
+        if (posicion) {
+          const emoji = posicion === 1 ? '🥇' : posicion === 2 ? '🥈' : posicion === 3 ? '🥉' : '🏅'
+          txt += `${emoji} Posición en ranking: *#${posicion}*\n`
+        }
+      }
 
-🎯 *L1:* ${u['Total Mobs lvl 1'] || 0} Mobs 🐰
-🎯 *L2:* ${u['Total Mobs lvl 2'] || 0} Mobs 🐺
-🎯 *L3:* ${u['Total Mobs lvl 3'] || 0} Mobs 🐲
-🎯 *L4:* ${u['Total Mobs lvl 4'] || 0} Mobs 🐧
-🎯 *L5:* ${u['Total Mobs lvl 5'] || 0} Mobs 🐯
-
-📅 *Fecha Reporte:* ${fechaReporte}
-
-🅣🅗 — 🅑🅞🅣`
+      txt += `\n━━━━━━━━━━━━━━━━━━━━━━━\n`
+      txt += `🅣🅗 — 🅑🅞🅣`
 
       await sock.sendMessage(chatId, { text: txt })
+
     } catch (error) {
-      console.error('❌ Error en /stats:', error)
+      console.error('❌ Error en #buscar:', error)
       await sock.sendMessage(chatId, {
-        text: '*⚠️ Ocurrió un error ejecutando /stats*',
+        text: '⚠️ Ocurrió un error al buscar el perfil. Intenta más tarde.',
       })
     }
   },

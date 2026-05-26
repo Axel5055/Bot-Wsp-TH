@@ -4,7 +4,7 @@ const fs = require('fs')
 module.exports = {
   name: 'mix',
   admin: false,
-  keywords: ['mixto', 'mixs'],
+  keywords: ['mixto', 'mixs', 'mixta'],
 
   execute: async (sock, msg) => {
     const imagePath = path.join(

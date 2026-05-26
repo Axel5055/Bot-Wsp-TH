@@ -11,12 +11,11 @@ module.exports = {
 
 🦊 *#mgeneral*  → \`Menú de Comandos generales\`  
 🦊 *#meventos*  → \`Menú de Eventos (FDG, arena, etc.)\`  
-🦊 *#mcaceria*  → \`Menú de Cacería/Evento Interno\`
+🦊 *#mcaceria*  → \`Menú de Cacería - Evento Interno - Reportes\`
 🦊 *#mtodos*    → \`Menú de Menciones\`
 🦊 *#marmaduras* → \`Menú de Armaduras\` 
-🦊 *#mreportes* → \`Menú de Reportes\`
-🦊 *#mescudos*  → \`Menú de Aviso de escudos\`
 🦊 *#mcuentas*  → \`Menú de Multicuentas\`
+🦊 *#mfdg*  → \`Menú de FDG\`
 
 🅣🅗 - 🅑🅞🅣
 `

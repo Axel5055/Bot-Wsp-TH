@@ -1,50 +1,80 @@
 {
   "axel": {
     "nombreDado": "Axel",
-    "ids": "625607335, 884346374",
-    "nombresDeCuentas": "Alastor6, SoNy5",
+    "ids": "611721390, 973732352, 559847999, 1893169834",
+    "nombresDeCuentas": "CrakSoder25, Nicki007, SoNy5, Desconocido",
     "ownerId": "242652851216536@lid"
   },
   "alci": {
     "nombreDado": "Alci",
-    "ids": "1467795273, 1727138266, 1806182451",
-    "nombresDeCuentas": "Viiktor I, xkaigaku7x, xTOMI0KAx",
+    "ids": "1467795273, 1835847308, 1806182451, 1727138266",
+    "nombresDeCuentas": "Viiktor I, Viiktor V, xkaigaku7x, xRudius",
     "ownerId": "230021419503851@lid"
-  },
-  "pantera": {
-    "nombreDado": "Pantera",
-    "ids": "559847999, 778540928, 817770675, 1044220425",
-    "nombresDeCuentas": "PANTER NGRA, Sh4dow5",
-    "ownerId": "239599347597423@lid"
   },
   "tom": {
     "nombreDado": "Tom",
-    "ids": "326455645, 357402771, 368989323, 416845218, 526268020",
+    "ids": "416845218, 326455645, 357402771, 368989323, 526268020",
     "nombresDeCuentas": "Abraracurcix, Asterix I, Barometrix, Obelix I, Panoramix I",
     "ownerId": "64287187964082@lid"
   },
   "toxic": {
     "nombreDado": "Toxic",
-    "ids": "658843231, 919665444, 1913187635, 1915163097, 1917368618, 1923743214, 1940642101, 2024927090, 2057192192, 2060348531",
-    "nombresDeCuentas": "Atlas7770, Hotspot 2, MiniFaker TH, NotLife2, tetona, TH Anteiku, TH Faker, TH NotLife, TH xJokerx, xJokerx TH",
+    "ids": "2115871936, 2024927090, 1940642101, 2060348531, 1915163097, 651360013, 545632943, 2057192192, 1923743214, 658843231, 1913187635, 1917368618",
+    "nombresDeCuentas": "Atlas55555, Atlas7770, Bank TH 1, Hotspot 2, MiniFaker TH, Notlife 1, Notlife 2, NotLife2, TH Anteiku, TH Faker, TH NotLife, xJokerx TH",
     "ownerId": "278391760654361@lid"
-  },
-  "mei": {
-    "nombreDado": "Mei",
-    "ids": "1327183228, 1371120004, 545632943, 651360013, 666840720",
-    "nombresDeCuentas": "xXAfrodltaXx, xXPersefon3X",
-    "ownerId": "167388230209694@lid"
   },
   "david": {
     "nombreDado": "David",
-    "ids": "723725687, 874666931",
-    "nombresDeCuentas": "FALCON221, yoshi tecojo",
+    "ids": "723725687, 874666931, 884346374",
+    "nombresDeCuentas": "FALCON221, yoshi tecojo, ZOOMBI3XX",
     "ownerId": "82850439290899@lid"
   },
   "dylan": {
     "nombreDado": "Dylan",
-    "ids": "829026210, 829081229, 829088153, 940947273",
-    "nombresDeCuentas": "Dpoolll, EL PAPY RAY, ReySparta, TH Badboys3",
+    "ids": "1483867967, 625607335, 829026210, 940947273, 829081229, 829088153",
+    "nombresDeCuentas": "badboys1, BadBoys4k, ReySparta, Valkiria4k, Desconocido, Desconocido",
     "ownerId": "183692110602327@lid"
+  },
+  "carlos": {
+    "nombreDado": "Carlos",
+    "ids": "1698596813, 735092980",
+    "nombresDeCuentas": "Gastly237, Gengar237",
+    "ownerId": "30580636954869@lid"
+  },
+  "juanjo": {
+    "nombreDado": "Juanjo",
+    "ids": "1041405085, 689257712, 1276495104",
+    "nombresDeCuentas": "BK Juanjo, Juanjojjp, Rastkolnikof",
+    "ownerId": "232843716374569@lid"
+  },
+  "black": {
+    "nombreDado": "Black",
+    "ids": "1693317344, 1268693750",
+    "nombresDeCuentas": "BLACK Vzla, Vzla Free",
+    "ownerId": "17755461955838@lid"
+  },
+  "bailen": {
+    "nombreDado": "Bailen",
+    "ids": "747071768, 777343597, 701806212, 1931591455",
+    "nombresDeCuentas": "CHACHO 78, X ANDALUCI X, X BAILEN X, XXGAELICOXX",
+    "ownerId": "55825984921733@lid"
+  },
+  "eduin": {
+    "nombreDado": "Eduin",
+    "ids": "1769834648, 927459756",
+    "nombresDeCuentas": "Vegueta 69, Vegueta blu",
+    "ownerId": "76381748744400@lid"
+  },
+  "pegaso": {
+    "nombreDado": "Pegaso",
+    "ids": "1041170254, 1040942817, 1264043363",
+    "nombresDeCuentas": "il pegaso, pegasotenma, xavy3r",
+    "ownerId": "146441389518875@lid"
+  },
+  "dhalan": {
+    "nombreDado": "Dhalan",
+    "ids": "422938512, 1279827382, 1041187189, 526144427",
+    "nombresDeCuentas": "Pactroclidha, PESADOS12, RODRIGUEZ 12, sargent01",
+    "ownerId": "176871115358316@lid"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "puntajeMinimo": 3200,
+  "premios": {
+    "1": "500M de Recursos",
+    "2": "250M de Recursos",
+    "3": "150M de Recursos"
+  }
+}

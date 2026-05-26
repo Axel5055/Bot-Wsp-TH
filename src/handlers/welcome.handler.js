@@ -28,8 +28,6 @@ Nos alegra tenerte con nosotros, @${tag}. Esperamos que te sientas cómodo(a) y 
 
 📝 Usa el comando *#reglas* para conocer las normas del grupo.
 
-🏆 El mejor cazador del mes gana *499 diamantes*.
-
 📝 Usa *#caza* para ver reglas de cacería.  
 🦊 Usa *#menu* o *#help* para ver todos los comandos.
 

@@ -39,8 +39,6 @@ Nos alegra tenerte con nosotros. Esperamos que te sientas cómodo(a) y disfrutes
 
 📝 Usa el comando *#reglas* para conocer las normas del grupo.
 
-🏆 Premios a los mejores cazadores en *Diamantes, Rss o Gemas*.
-
 📝 Usa *#caza* para ver reglas de cacería.
 🦊 Usa *#menu* o *#help* para ver todos los comandos.
 

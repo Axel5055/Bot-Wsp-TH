@@ -1,4 +1,6 @@
-// 🔑 Cargar variables de entorno (DEBE SER LO PRIMERO)
+// bot.js
+// ✅ OPTIMIZADO: variables de entorno, manejo de errores robusto, sin hardcodeo
+
 require('dotenv').config()
 
 const {
@@ -10,18 +12,40 @@ const {
 
 const Pino = require('pino')
 const qrcode = require('qrcode-terminal')
+const path = require('path')
 
-const startMessageHandler = require('./handlers/message.handler')
-const { loadWorkbook } = require('./cache/excelCache')
-
-// 👋 Auto welcome
-const setupAutoWelcome = require('./handlers/welcome.handler')
-
-// 🦊 SoNy handler
-const initSony = require('./handlers/sony.handler')
-
-// 🌍 Traducción por reacción
+const startMessageHandler  = require('./handlers/message.handler')
+const { loadWorkbook }     = require('./cache/excelCache')
+const setupAutoWelcome     = require('./handlers/welcome.handler')
+const initSony             = require('./handlers/sony.handler')
 const initTranslateReaction = require('./handlers/translate.reaction')
+const startTelegramBridge  = require('./services/telegram.bridge')
+const startQueueWorker     = require('./utils/queueWorker')
+
+// ─────────────────────────────────────────────
+// ⚙️ Configuración desde .env
+// ─────────────────────────────────────────────
+const WHATSAPP_GROUP_ID = process.env.WHATSAPP_GROUP_ID
+
+if (!WHATSAPP_GROUP_ID) {
+  console.error('❌ WHATSAPP_GROUP_ID no está definido en el .env')
+  process.exit(1)
+}
+
+// 🖼️ Rutas de imágenes de alertas
+const IMAGES = {
+  watcher:      path.join(__dirname, '../media/images/alertas/watcher.jpg'),
+  chaos_dragon: path.join(__dirname, '../media/images/alertas/chaos_dragon.jpg'),
+  orb_brillante: path.join(__dirname, '../media/images/alertas/red_orbe.jpg'),
+  orb_radiante:  path.join(__dirname, '../media/images/alertas/yellow_orb.jpg'),
+  orb_combo:     path.join(__dirname, '../media/images/alertas/orbs.jpg'),
+  ancient_core:  path.join(__dirname, '../media/images/alertas/ancient_core.jpg'),
+}
+
+// ─────────────────────────────────────────────
+// 🤖 Inicio del bot
+// ─────────────────────────────────────────────
+let telegramStarted = false
 
 async function startBot() {
   console.log('🚀 Iniciando bot...')
@@ -33,41 +57,61 @@ async function startBot() {
     version,
     auth: state,
     logger: Pino({ level: 'silent' }),
-    browser: ['SoNy Bot', 'Chrome', '1.0.0']
+    browser: ['SoNy Bot', 'Chrome', '1.0.0'],
   })
 
   sock.ev.on('creds.update', saveCreds)
 
-  // ✅ Registrar bienvenida automática
+  // Registrar handlers que no dependen de conexión
   setupAutoWelcome(sock)
-
-  // 🌍 Activar traducción por bandera
   initTranslateReaction(sock)
+  startMessageHandler(sock)
 
+  // ─── Eventos de conexión ───
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update
 
-    // 🔥 Mostrar QR correctamente
     if (qr) {
       console.log('\n📲 Escanea este QR con WhatsApp\n')
       qrcode.generate(qr, { small: true })
     }
 
     if (connection === 'open') {
-      console.log('✅ Bot conectado correctamente')
+      console.log('✅ Bot conectado')
 
+      // Cargar Excel
       try {
         loadWorkbook()
-        console.log('📊 Excel precargado correctamente')
+        console.log('📊 Excel precargado')
       } catch (err) {
-        console.error('❌ Error cargando Excel:', err)
+        console.error('❌ Error cargando Excel:', err.message)
       }
 
+      // SoNy IA
       try {
         initSony(sock)
-        console.log('🦊 SoNy iniciado correctamente')
+        console.log('🦊 SoNy iniciado')
       } catch (err) {
-        console.error('❌ Error al iniciar SoNy:', err)
+        console.error('❌ Error iniciando SoNy:', err.message)
+      }
+
+      // Telegram bridge (solo una vez)
+      if (!telegramStarted) {
+        try {
+          startTelegramBridge(sock)
+          telegramStarted = true
+          console.log('📡 Telegram bridge iniciado')
+        } catch (err) {
+          console.error('❌ Error iniciando Telegram:', err.message)
+        }
+      }
+
+      // Queue worker para alertas
+      try {
+        startQueueWorker(sock, WHATSAPP_GROUP_ID, IMAGES)
+        console.log('🔄 Queue worker iniciado')
+      } catch (err) {
+        console.error('❌ Error iniciando worker:', err.message)
       }
     }
 
@@ -78,18 +122,16 @@ async function startBot() {
 
       console.log('❌ Conexión cerrada. Código:', statusCode)
 
-      // 🔥 SI ES LOGOUT (405) NO RECONECTAR
       if (statusCode === DisconnectReason.loggedOut) {
-        console.log('⚠️ Sesión cerrada. Borra src/sessions y reinicia el bot.')
+        console.log('⚠️ Sesión cerrada (loggedOut). Borra src/sessions y reinicia.')
+        console.log('🛑 Cerrando proceso para evitar quedarse zombie...')
+        process.exit(1)  // ← sale limpiamente con código de error
       } else {
-        console.log('🔄 Reconectando en 3 segundos...')
-        setTimeout(() => startBot(), 3000)
+        console.log('🔄 Reconectando en 5 segundos...')
+        setTimeout(startBot, 5000)
       }
     }
   })
-
-  // 📩 Handler principal de mensajes
-  startMessageHandler(sock)
 }
 
 module.exports = startBot

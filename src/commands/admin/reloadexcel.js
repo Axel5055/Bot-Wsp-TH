@@ -1,28 +1,27 @@
+// commands/admin/reloadexcel.js
+// ✅ OPTIMIZADO: usa reloadCommands del command handler
+
 const { clearCache, loadWorkbook } = require('../../cache/excelCache')
 
 module.exports = {
   name: 'reloadexcel',
-  admin: true, // 👈 isadmin se encarga
+  admin: true,
 
-  async execute(sock, msg) {
+  execute: async (sock, msg) => {
     const chatId = msg.key.remoteJid
 
     try {
-      // ♻️ Limpiar cache
       clearCache()
-
-      // 📊 Volver a cargar Excel en memoria
       loadWorkbook()
 
       await sock.sendMessage(chatId, {
-        text: '♻️ *Excel recargado correctamente en memoria.*',
+        text: '✅ Excel recargado correctamente.'
       })
-    } catch (error) {
-      console.error('❌ Error en /reloadexcel:', error)
-
+    } catch (err) {
+      console.error('❌ Error recargando Excel:', err)
       await sock.sendMessage(chatId, {
-        text: '⚠️ Ocurrió un error al recargar el Excel.',
+        text: `❌ Error al recargar el Excel: ${err.message}`
       })
     }
-  },
+  }
 }
