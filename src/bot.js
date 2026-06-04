@@ -21,6 +21,8 @@ const initSony             = require('./handlers/sony.handler')
 const initTranslateReaction = require('./handlers/translate.reaction')
 const startTelegramBridge  = require('./services/telegram.bridge')
 const startQueueWorker     = require('./utils/queueWorker')
+// Importar al inicio del archivo junto a los demás imports
+const { iniciarTimer } = require('./utils/escudo.timer')
 
 // ─────────────────────────────────────────────
 // ⚙️ Configuración desde .env
@@ -93,6 +95,14 @@ async function startBot() {
         console.log('🦊 SoNy iniciado')
       } catch (err) {
         console.error('❌ Error iniciando SoNy:', err.message)
+      }
+
+      // ✅ Timer de escudos — AGREGAR ESTO
+      try {
+        iniciarTimer(sock)
+        console.log('⏱️ Timer de escudos iniciado')
+      } catch (err) {
+        console.error('❌ Error iniciando timer de escudos:', err.message)
       }
 
       // Telegram bridge (solo una vez)

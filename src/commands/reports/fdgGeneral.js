@@ -89,7 +89,7 @@ module.exports = {
         txt  += `🏆 Mejor jugador: *${topJugador}* (${maxPuntos} pts)\n`
       }
 
-      txt    += `\n📅 ${fecha}\n`
+      txt    += `\n📅 ${fecha}\n\n`
       txt    += `🅣🅗 — 🅑🅞🅣`
 
       await sock.sendMessage(chatId, { text: txt })

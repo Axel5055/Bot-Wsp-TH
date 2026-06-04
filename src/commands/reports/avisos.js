@@ -116,7 +116,7 @@ module.exports = {
           const total = META_SEMANAL + debeActual + deudaAnteriorTotal
           const texto = buildAvisoText(u, tipo, puntos, debeActual, bloqueDeudas, total, deudaAnteriorTotal, META_SEMANAL)
 
-          await sock.sendMessage(`${u.Numero}@c.us`, { text: texto })
+          await sock.sendMessage(`${u.Numero}@s.whatsapp.net`, { text: texto })
           enviados++
           await sleep(1500)
 

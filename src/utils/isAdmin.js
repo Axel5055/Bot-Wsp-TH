@@ -1,3 +1,4 @@
+// src/utils/isAdmin.js - Verifica si un JID es admin según la configuración
 const { admins } = require('../config/settings')
 
 module.exports = (jid) => {

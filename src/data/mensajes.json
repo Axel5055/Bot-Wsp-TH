@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "titulo": "Reglas de Caceria",
+    "texto": "REGLAS DE CACERIA\n\nControl semanal: Domingo a Domingo\n\nReglas:\n- Solo cuentan monstruos Nivel 2+\n- Meta semanal: 35 puntos\n- Se recomienda realizar 5 MOBS al dia para cumplir\n\nIncumplimiento:\n1 aviso si no cumples.\nSi se repite en semanas siguientes: Expulsion.\n\nEquivalencias de puntos:\nNvl 2 = 1 punto\nNvl 3 = 5 puntos\nNvl 4 = 9 puntos\nNvl 5 = 18 puntos\n\nMulticuentas:\nSi tienes multicuentas en el gremio usa el comando #helpcuentas y registra tus cuentas como se indica.\n\nDudas: MP al R5 o WhatsApp\n\nTH — BOT"
+  },
+  {
+    "id": 2,
+    "titulo": "Reglas del Gremio",
+    "texto": "REGLAS DEL GREMIO\n\nIngreso:\n- Mensaje a R4 o R5. Solicitud a ciegas sera rechazada.\n\nPoder minimo:\n- +500 Millones, T4 y/o T5 o cerca de tenerlas.\n\nCaceria:\n- Estricta y controlada semanalmente.\n- Minimo 5 lvl2 = 35 puntos semanales.\n\nPapiro:\n- Contar con papiro siempre.\n\nActividad:\n- 3 dias de inactividad sin avisar = Expulsion.\n\nEventos obligatorios:\n- FDG: Puntaje minimo segun la liga. No cumplir = Expulsion por 3 dias.\n- Arena: Ultimo horario o penultimo. Confirmar y no asistir = Sancion de RSS. Reincidencia = Expulsion contemplada.\n- KvK: Solitario. No cumplir el puntaje = Multa de RSS. Reincidencia = Expulsion contemplada.\n\nDudas: MP al R4 o R5\n\nTH — BOT"
+  },
+  {
+    "id": 3,
+    "titulo": "Multicuentas",
+    "texto": "SoNy BOT - Multicuentas\n\nREGISTRAR CUENTAS\nComando: #addcuentas Nombre ID1,ID2\nRegistra tus cuentas con los IGG IDs.\nEjemplo: #addcuentas Axel 123456789,987654321\n- Solo puedes tener un registro a tu nombre.\n- Los IDs deben existir en el Excel de Caceria.\n\nVER USUARIOS\nComando: #listcuentas\nMuestra todos los usuarios registrados.\nComando: #listcuentas Nombre\nMuestra el detalle de un usuario en concreto.\nEjemplo: #listcuentas Axel\n\nEDITAR CUENTAS\n#editcuentas Nombre +ID1,ID2 — Agregar IDs\n#editcuentas Nombre -ID1,ID2 — Eliminar IDs\n#editcuentas Nombre =ID1,ID2 — Reemplazar todos\nEjemplo: #editcuentas Axel +111222333\n\nACTUALIZAR NOMBRES\nComando: #refreshcuentas TuNombre\nSincroniza los nombres de tus cuentas con el Excel.\n- Admins pueden omitir el nombre para actualizar todos.\n\nREGLAS\n- Los IDs deben existir en el Excel de Caceria.\n- No se permiten IDs duplicados entre usuarios.\n- Cada usuario solo puede tener un registro.\n- Solo admins pueden registrar/editar cuentas ajenas con menciones.\n\nUsa #helpcuentas para ver esta guia nuevamente.\nTH — BOT"
+  }
+]

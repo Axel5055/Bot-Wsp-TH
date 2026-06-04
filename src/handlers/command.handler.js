@@ -1,10 +1,11 @@
-// command.handler.js
+// /src/handlers/command.handler.js
 // ✅ OPTIMIZADO: comandos cargados en un Map al inicio, no en cada mensaje
 
 const fs = require('fs')
 const path = require('path')
 const { prefix } = require('../config/settings')
 const isAdmin = require('../utils/isAdmin')
+const isMensajero = require('../utils/isMensajero')
 
 // ─────────────────────────────────────────────
 // 📦 Cargar todos los comandos UNA SOLA VEZ al iniciar
@@ -73,15 +74,30 @@ module.exports = async (sock, msg, text) => {
 
   if (!command) return // Comando no encontrado, ignorar silenciosamente
 
-  // 🔒 Verificar permisos de admin
-  if (command.admin) {
-    const senderJid = msg.key.participant || msg.key.remoteJid
-    if (!isAdmin(senderJid)) {
-      return sock.sendMessage(msg.key.remoteJid, {
-        text: '⛔ Este comando es solo para administradores.'
-      })
-    }
+  const senderJid = msg.key.participant || msg.key.remoteJid
+
+  // 🔒 Verificar permisos
+const userIsAdmin = isAdmin(senderJid)
+const userIsMensajero = isMensajero(senderJid)
+
+// Si el comando requiere admin O mensajero, el usuario debe cumplir al menos uno
+const requiresRole = command.admin || command.mensajero
+
+if (requiresRole) {
+  const hasPermission =
+    (command.admin && userIsAdmin) ||
+    (command.mensajero && userIsMensajero)
+
+  if (!hasPermission) {
+    const roles = []
+    if (command.admin) roles.push('administrador')
+    if (command.mensajero) roles.push('mensajero')
+
+    return sock.sendMessage(msg.key.remoteJid, {
+      text: `⛔ Este comando es solo para: ${roles.join(' o ')}.`
+    })
   }
+}
 
   // 🚀 Ejecutar comando
   try {

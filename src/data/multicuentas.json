@@ -7,8 +7,8 @@
   },
   "alci": {
     "nombreDado": "Alci",
-    "ids": "1467795273, 1835847308, 1806182451, 1727138266",
-    "nombresDeCuentas": "Viiktor I, Viiktor V, xkaigaku7x, xRudius",
+    "ids": "1835847308, 1467795273, 1806182451, 1727138266",
+    "nombresDeCuentas": "Moscu V, Washington I, xkaigaku7x, xRudius",
     "ownerId": "230021419503851@lid"
   },
   "tom": {
@@ -19,8 +19,8 @@
   },
   "toxic": {
     "nombreDado": "Toxic",
-    "ids": "2115871936, 2024927090, 1940642101, 2060348531, 1915163097, 651360013, 545632943, 2057192192, 1923743214, 658843231, 1913187635, 1917368618",
-    "nombresDeCuentas": "Atlas55555, Atlas7770, Bank TH 1, Hotspot 2, MiniFaker TH, Notlife 1, Notlife 2, NotLife2, TH Anteiku, TH Faker, TH NotLife, xJokerx TH",
+    "ids": "2115871936, 2024927090, 2060348531, 658843231, 1915163097, 651360013, 545632943, 2057192192, 1923743214, 1913187635, 1917368618, 1940642101",
+    "nombresDeCuentas": "Atlas55555, Atlas7770, Hotspot 2, LifeToxic, MiniFaker TH, Notlife 1, Notlife 2, NotLife2, TH Anteiku, TH NotLife, xJokerx TH, Desconocido",
     "ownerId": "278391760654361@lid"
   },
   "david": {
@@ -31,8 +31,8 @@
   },
   "dylan": {
     "nombreDado": "Dylan",
-    "ids": "1483867967, 625607335, 829026210, 940947273, 829081229, 829088153",
-    "nombresDeCuentas": "badboys1, BadBoys4k, ReySparta, Valkiria4k, Desconocido, Desconocido",
+    "ids": "1483867967, 625607335, 829088153, 829026210, 940947273, 829081229",
+    "nombresDeCuentas": "badboys1, BadBoys4k, OzMagig, ReySparta, SHADOOM24, Desconocido",
     "ownerId": "183692110602327@lid"
   },
   "carlos": {
@@ -50,7 +50,7 @@
   "black": {
     "nombreDado": "Black",
     "ids": "1693317344, 1268693750",
-    "nombresDeCuentas": "BLACK Vzla, Vzla Free",
+    "nombresDeCuentas": "Desconocido, Desconocido",
     "ownerId": "17755461955838@lid"
   },
   "bailen": {
@@ -73,8 +73,14 @@
   },
   "dhalan": {
     "nombreDado": "Dhalan",
-    "ids": "422938512, 1279827382, 1041187189, 526144427",
-    "nombresDeCuentas": "Pactroclidha, PESADOS12, RODRIGUEZ 12, sargent01",
+    "ids": "1041187189, 422938512, 1279827382, 526144427",
+    "nombresDeCuentas": "RODRIGUEZ 12, Desconocido, Desconocido, Desconocido",
     "ownerId": "176871115358316@lid"
+  },
+  "jony": {
+    "nombreDado": "Jony",
+    "ids": "471968668, 582104628, 395091349",
+    "nombresDeCuentas": "David051190, JonyG2013, Th3BigB0ss",
+    "ownerId": "253283482493048@lid"
   }
 }

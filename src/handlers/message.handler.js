@@ -1,22 +1,19 @@
 // message.handler.js
-// ✅ OPTIMIZADO: caché de metadatos de grupo, no hace llamada de red por cada mensaje
-
 const commandHandler = require('./command.handler')
 const triggers = require('../triggers')
 const chalk = require('chalk').default
+const { cargarRegistros } = require('../utils/escudos.utils')
+const { gruposAlerta } = require('../config/settings')
 
 // ─────────────────────────────────────────────
-// 🗂️ Caché de nombres de grupo (evita llamadas repetidas)
+// 🗂️ Caché de nombres de grupo
 // ─────────────────────────────────────────────
 const groupNameCache = new Map()
-const GROUP_CACHE_TTL = 10 * 60 * 1000 // 10 minutos
+const GROUP_CACHE_TTL = 10 * 60 * 1000
 
 async function getGroupName(sock, remoteJid) {
   const cached = groupNameCache.get(remoteJid)
-  if (cached && Date.now() - cached.ts < GROUP_CACHE_TTL) {
-    return cached.name
-  }
-
+  if (cached && Date.now() - cached.ts < GROUP_CACHE_TTL) return cached.name
   try {
     const metadata = await sock.groupMetadata(remoteJid)
     const name = metadata.subject || 'Grupo desconocido'
@@ -24,6 +21,48 @@ async function getGroupName(sock, remoteJid) {
     return name
   } catch {
     return 'Grupo desconocido'
+  }
+}
+
+// ─────────────────────────────────────────────
+// 🛡️ Listener de respuestas de escudo (mensajes privados)
+// ─────────────────────────────────────────────
+const FRASES_CLAVE = ['voy', 'ya voy', 'voy a entrar', 'ya estoy', 'entrando', 'escudando', 'ya entro']
+
+async function manejarRespuestaEscudo(sock, msg) {
+  const remoteJid = msg.key.remoteJid
+
+  if (remoteJid.endsWith('@g.us')) return
+
+  const texto = (
+    msg.message?.conversation ||
+    msg.message?.extendedTextMessage?.text || ''
+  ).toLowerCase().trim()
+
+  const esRespuesta = FRASES_CLAVE.some(f => texto.includes(f))
+  if (!esRespuesta) return
+
+  const registros = cargarRegistros()
+
+  // ✅ Buscar por jid (LID) en lugar de por número de teléfono
+  const registro = registros.find(r => r.jid === remoteJid)
+
+  console.log('[ESCUDO DEBUG] remoteJid:', remoteJid)
+  console.log('[ESCUDO DEBUG] registro encontrado:', registro)
+
+  if (!registro) return
+
+  const respuestaMensaje = texto.includes('ya estoy') || texto.includes('entrando') || texto.includes('ya entro')
+    ? `✅ *${registro.nombre}* ya está *dentro del juego* escudando. 🛡️`
+    : `🏃 *${registro.nombre}* va *en camino* a escudar. ¡Ya va entrando!`
+
+  for (const grupoId of gruposAlerta) {
+    try {
+      await sock.sendMessage(grupoId, { text: respuestaMensaje })
+      console.log('[ESCUDO DEBUG] mensaje enviado al grupo:', grupoId)
+    } catch (err) {
+      console.error('[ESCUDO DEBUG] error enviando al grupo:', err.message)
+    }
   }
 }
 
@@ -39,14 +78,15 @@ module.exports = (sock) => {
     if (msg.key.fromMe) return
     if (msg.key.remoteJid === 'status@broadcast') return
 
-    // 🔇 Ignorar mensajes internos del protocolo
     const { protocolMessage, reactionMessage, senderKeyDistributionMessage } = msg.message
     if (protocolMessage || reactionMessage || senderKeyDistributionMessage) return
 
     const remoteJid = msg.key.remoteJid
     const isGroup = remoteJid.endsWith('@g.us')
 
-    // ─── Extraer texto del mensaje ───
+    // 🛡️ Verificar respuestas de escudo ANTES de filtrar privados
+    await manejarRespuestaEscudo(sock, msg)
+
     const messageContent = msg.message
     const messageType = Object.keys(messageContent)[0]
 
@@ -61,12 +101,10 @@ module.exports = (sock) => {
 
     if (!textMessage && !isMedia) return
 
-    // ─── Datos del remitente ───
     const senderJid = msg.key.participant || msg.key.remoteJid
     const senderNumber = senderJid.split('@')[0]
     const senderName = msg.pushName || 'Desconocido'
 
-    // ─── Datos del grupo (con caché) ───
     let groupName = 'Privado'
     let groupId = 'N/A'
 
@@ -75,7 +113,6 @@ module.exports = (sock) => {
       groupName = await getGroupName(sock, remoteJid)
     }
 
-    // ─── Preview para el log ───
     const MAX_LENGTH = 80
     let messagePreview = ''
 
@@ -94,20 +131,17 @@ module.exports = (sock) => {
       if (!messagePreview) return
     }
 
-    // ─── Log en consola ───
     console.log(chalk.bold('\n📩 NUEVO MENSAJE'))
     console.log(chalk.gray('────────────────────────────'))
-    console.log(chalk.blue('👥 Grupo:'),   chalk.white(groupName))
-    console.log(chalk.blue('🆔 ID:'),      chalk.white(groupId))
-    console.log(chalk.green('📞 Número:'), chalk.white(senderNumber))
-    console.log(chalk.green('👤 Usuario:'),chalk.white(senderName))
-    console.log(chalk.yellow('💬 Msg:'),   messagePreview)
+    console.log(chalk.blue('👥 Grupo:'),    chalk.white(groupName))
+    console.log(chalk.blue('🆔 ID:'),       chalk.white(groupId))
+    console.log(chalk.green('📞 Número:'),  chalk.white(senderNumber))
+    console.log(chalk.green('👤 Usuario:'), chalk.white(senderName))
+    console.log(chalk.yellow('💬 Msg:'),    messagePreview)
     console.log(chalk.gray('────────────────────────────\n'))
 
-    // ─── Lógica del bot ───
     await commandHandler(sock, msg, textMessage)
 
-    // Ejecutar triggers en paralelo (más rápido, fallos aislados)
     await Promise.allSettled(
       triggers.map(trigger => trigger(sock, msg, textMessage))
     )
