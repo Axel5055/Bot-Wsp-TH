@@ -15,7 +15,7 @@ module.exports = {
     try {
       await sock.sendMessage(chatId, { react: { text: '🏆', key: msg.key } })
 
-      const sheet = getSheet(3)
+      const sheet = getSheet(2)
       if (!sheet) {
         await sock.sendMessage(chatId, { text: '⚠️ No se encontró la hoja de ranking en el Excel.' })
         return
@@ -28,7 +28,7 @@ module.exports = {
       }
 
       const top    = data.sort((a, b) => (b.Total || 0) - (a.Total || 0)).slice(0, 10)
-      const mes    = sheet['J1']?.v || 'Mes actual'
+      const mes    = sheet['K2']?.v || 'Mes actual'
       const year   = moment().tz('America/Mexico_City').format('YYYY')
       const medals = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟']
 

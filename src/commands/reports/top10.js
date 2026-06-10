@@ -16,7 +16,7 @@ module.exports = {
     try {
       await sock.sendMessage(chatId, { react: { text: '🏅', key: msg.key } })
 
-      const sheet = getSheet(1)
+      const sheet = getSheet(0)
       if (!sheet) {
         await sock.sendMessage(chatId, { text: '⚠️ No se encontró la hoja de Top 10 semanal en el Excel.' })
         return
@@ -29,7 +29,10 @@ module.exports = {
       }
 
       const fechaReporte = sheet['E2']?.v || moment().tz('America/Mexico_City').format('DD/MM/YYYY')
-      const top    = data.sort((a, b) => (b.Puntos || 0) - (a.Puntos || 0)).slice(0, 10)
+      const top = data
+        .filter(u => u['Nombre'] && u['Nombre'] !== 'Total Semanal') // excluir fila de totales
+        .sort((a, b) => (b['Puntos Nvl 2'] || 0) - (a['Puntos Nvl 2'] || 0))
+        .slice(0, 10)
       const medals = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟']
 
       let txt = `━━━━━━━━━━━━━━━━━━━━━━━\n`
@@ -37,7 +40,7 @@ module.exports = {
       txt    += `━━━━━━━━━━━━━━━━━━━━━━━\n`
 
       top.forEach((u, i) => {
-        txt += `${medals[i]} *${u.Nombre}* — ${u.Puntos || 0} pts | 🏹 ${u.Total || 0} mobs ${getRandomIcono()}\n`
+        txt += `${medals[i]} *${u.Nombre}* — ${u['Puntos Nvl 2'] || 0} pts | 🏹 ${u.Total || 0} mobs ${getRandomIcono()}\n`
       })
 
       txt += `━━━━━━━━━━━━━━━━━━━━━━━\n`

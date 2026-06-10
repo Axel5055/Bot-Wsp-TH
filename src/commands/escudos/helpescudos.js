@@ -20,7 +20,7 @@ Recibe alertas por mensaje privado cuando tu escudo cae, y registra tu escudo ac
 
 📝 *Registrarse*
 \`#addescudo NombreIngame, NumeroConLada\`
-_Registra tu nombre y número para recibir alertas._
+_Puedes tener múltiples cuentas registradas. Cada cuenta tiene su propio ID._
 
 Ejemplo:
 \`#addescudo SoNy, 5215512345678\`
@@ -31,40 +31,57 @@ Ejemplo:
 🇨🇴 Colombia → 57XXXXXXXXXX
 
 ─────────────────────
-👁️ *Ver mi registro*
-\`#miperfil\`
-_Muestra tu nombre y número registrado._
+👁️ *Ver mi perfil*
+\`#miescudo\`
+_Muestra tus cuentas registradas y si tienen escudo activo._
+
+\`#miescudo ID / Nombre / 4dígitos\`
+_Consulta el perfil de otro jugador._
+
+Ejemplos:
+\`#miescudo\`
+\`#miescudo SoNy\`
+\`#miescudo 3\`
+\`#miescudo 5678\`
 
 ─────────────────────
 ✏️ *Editar mi registro*
-\`#editescudo NombreNuevo, NumeroNuevo\`
-_Actualiza tu propio nombre o número._
+\`#editescudo ID/Nombre/4dígitos, NombreNuevo, NumeroNuevo\`
+_Solo puedes editar tus propias cuentas._
 
-Ejemplo:
-\`#editescudo SoNy, 5215598765432\`
+Ejemplos:
+\`#editescudo SoNy, SoNy2, 5215598765432\`
+\`#editescudo 3, SoNy2, 5215598765432\`
 
 ─────────────────────
 🗑️ *Eliminar mi registro*
 \`#delescudo\`
-_Borra tu registro. Ya no recibirás alertas._
+_Si tienes una sola cuenta la borra directo._
+_Si tienes varias, te mostrará la lista para que elijas._
+
+\`#delescudo ID\`
+_Borra una cuenta específica tuya._
 
 ─────────────────────
 🛡️ *Registrar escudo activo*
 \`#ponescudo TipoDeEscudo\`
-_Registra el escudo que pusiste. El bot te avisará 10 min antes de que venza._
+_Si tienes una sola cuenta._
+
+\`#ponescudo ID TipoDeEscudo\`
+_Si tienes varias cuentas, especifica a cuál._
 
 Escudos disponibles:
-- *4h* • *8h* • *12h* • *24h* • *3d* • *7d* • *14d*
+• *4h* • *8h* • *12h* • *24h* • *3d* • *7d* • *14d*
 
-Ejemplo:
-\`#ponescudo 4h\`
-\`#ponescudo 24h\`
+Ejemplos:
+\`#ponescudo 8h\`
+\`#ponescudo 3 24h\`
 
 ─────────────────────
 🚨 *Alertar escudo caído*
 \`#escudo NombreIngame\`
 \`#escudo ID\`
-\`#escudo 4digitos\`
+\`#escudo 4dígitos\`
 _Envía 5 alertas al número privado del jugador._
 
 Ejemplos:
@@ -77,7 +94,7 @@ Ejemplos:
 ─────────────────────
 📋 *Ver jugadores registrados*
 \`#listescudos\`
-_Muestra todos los jugadores con alerta activa, su ID y tag._
+_Muestra todos los registros con su ID y tag._
 
 ━━━━━━━━━━━━━━━━━━━━
 🔑 *COMANDOS EXCLUSIVOS PARA ADMINS*
@@ -90,18 +107,21 @@ Ejemplo:
 \`#addescudo SoNy, 5215512345678, @usuario\`
 
 ─────────────────────
-✏️ *Editar registro de otro usuario*
-\`#editescudo NombreActual, NombreNuevo, NumeroNuevo\`
+✏️ *Editar registro de cualquier usuario*
+\`#editescudo ID/Nombre/4dígitos, NombreNuevo, NumeroNuevo\`
 
-Ejemplo:
+Ejemplos:
 \`#editescudo SoNy, SoNy_RoK, 5215598765432\`
+\`#editescudo 3, SoNy_RoK, 5215598765432\`
 
 ─────────────────────
-🗑️ *Eliminar registro de otro usuario*
-\`#delescudo NombreIngame\`
+🗑️ *Eliminar registro de cualquier usuario*
+\`#delescudo ID/Nombre/4dígitos\`
 
-Ejemplo:
+Ejemplos:
 \`#delescudo SoNy\`
+\`#delescudo 3\`
+\`#delescudo 5678\`
 
 ━━━━━━━━━━━━━━━━━━━━
 ❓ *¿Dudas?*

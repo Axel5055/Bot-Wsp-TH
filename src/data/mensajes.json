@@ -13,5 +13,10 @@
     "id": 3,
     "titulo": "Multicuentas",
     "texto": "SoNy BOT - Multicuentas\n\nREGISTRAR CUENTAS\nComando: #addcuentas Nombre ID1,ID2\nRegistra tus cuentas con los IGG IDs.\nEjemplo: #addcuentas Axel 123456789,987654321\n- Solo puedes tener un registro a tu nombre.\n- Los IDs deben existir en el Excel de Caceria.\n\nVER USUARIOS\nComando: #listcuentas\nMuestra todos los usuarios registrados.\nComando: #listcuentas Nombre\nMuestra el detalle de un usuario en concreto.\nEjemplo: #listcuentas Axel\n\nEDITAR CUENTAS\n#editcuentas Nombre +ID1,ID2 — Agregar IDs\n#editcuentas Nombre -ID1,ID2 — Eliminar IDs\n#editcuentas Nombre =ID1,ID2 — Reemplazar todos\nEjemplo: #editcuentas Axel +111222333\n\nACTUALIZAR NOMBRES\nComando: #refreshcuentas TuNombre\nSincroniza los nombres de tus cuentas con el Excel.\n- Admins pueden omitir el nombre para actualizar todos.\n\nREGLAS\n- Los IDs deben existir en el Excel de Caceria.\n- No se permiten IDs duplicados entre usuarios.\n- Cada usuario solo puede tener un registro.\n- Solo admins pueden registrar/editar cuentas ajenas con menciones.\n\nUsa #helpcuentas para ver esta guia nuevamente.\nTH — BOT"
+  },
+  {
+    "id": 4,
+    "titulo": "Formaciones",
+    "texto": "Todos en el gremio deben de tener guardadas estás formaciones y listas para solo dar click y enviar sin perder tiempo \n\n9-4-7 = 90k-40k-70k\n\n8-4-8 = 80k-40k-80k\n\n8-8-4/9-9-2 = 80k-80k-40k/90k-90k-20k\n\n14-3-3/15-0-5 = 140k-30k-30k/150k-0-50k\n\n5-6-9 = 50k-60k-90k-\n\nPor orden sería por si no saben\n\n80k infantería \n40k artillería \n80k caballería \n\nY así mismo con las demás formaciones\n\nPor favor esperar a que el RL te diga que mandar no mandes a las primeras"
   }
 ]

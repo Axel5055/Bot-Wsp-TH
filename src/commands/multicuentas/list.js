@@ -1,20 +1,22 @@
+// src/commands/multicuentas/list.js
 'use strict'
 
 const {
-  getText,
   normalizeKey,
   parseIds,
   sortStrings,
-  cargarMulticuentas,
-  cargarCazaDesdeCache,
-  obtenerNombresPorIds,
-} = require('../../utils/multiManager')
+  todosLosUsuarios,
+  usuarioPorKey,
+} = require('../../database/multicuentas.db')
+const { leerCaza } = require('../../database/excel')
 
-// ─── Comando ──────────────────────────────────────────────────────────────────
+function getText(msg) {
+  return msg.message?.conversation || msg.message?.extendedTextMessage?.text || ''
+}
+
 module.exports = {
   name: 'listcuentas',
   admin: false,
-  description: 'Lista todos los usuarios registrados, o el detalle de uno en concreto',
 
   async execute(sock, msg) {
     const chatId = msg.key.remoteJid
@@ -22,60 +24,55 @@ module.exports = {
     if (!body) return
 
     try {
-      // Quitar prefijo del comando
       const args = body.replace(/^[!/#.]\w+\s*/i, '').trim()
+      const todos = await todosLosUsuarios()
 
-      const base = cargarMulticuentas()
-
-      if (!Object.keys(base).length) {
-        await sock.sendMessage(chatId, { text: '⚠️ No hay usuarios registrados aún.' })
-        return
+      if (!todos.length) {
+        return sock.sendMessage(chatId, { text: '⚠️ No hay usuarios registrados aún.' })
       }
 
-      let respuesta = ''
-
-      // ── Detalle de un usuario ───────────────────────────────────────────────
+      // Detalle de un usuario
       if (args) {
-        const key = normalizeKey(args)
-        if (!base[key]) {
-          await sock.sendMessage(chatId, {
+        const usuario = await usuarioPorKey(args)
+        if (!usuario) {
+          return sock.sendMessage(chatId, {
             text: `⚠️ No se encontró ningún usuario con el nombre *${args}*.`
           })
-          return
         }
 
-        const user      = base[key]
-        const ids       = parseIds(user.ids)
-        const hojaCaza  = cargarCazaDesdeCache()
-        const { nombres, noEncontrados } = obtenerNombresPorIds(ids, hojaCaza)
+        const ids    = parseIds(usuario.ids_juego)
+        const caza   = leerCaza()
+        const nombres = []
+        const noEncontrados = []
 
-        respuesta += `📋 *Detalle de ${user.nombreDado}*\n`
-        respuesta += `🆔 IDs: ${ids.join(', ') || 'Ninguno'}\n`
-        respuesta += `💻 Cuentas: ${sortStrings(nombres).join(', ') || 'Ninguna'}\n`
+        for (const id of ids) {
+          const entrada = caza.find(f => f.igg_id === id)
+          if (entrada) nombres.push(entrada.nombre)
+          else noEncontrados.push(id)
+        }
+
+        let respuesta = `📋 *Detalle de ${usuario.nombre_dado}*\n`
+        respuesta    += `🆔 IDs: ${ids.join(', ') || 'Ninguno'}\n`
+        respuesta    += `💻 Cuentas: ${sortStrings(nombres).join(', ') || 'Ninguna'}\n`
+
         if (noEncontrados.length)
           respuesta += `⚠️ No encontrados en Excel: ${noEncontrados.join(', ')}`
 
-      // ── Lista global ────────────────────────────────────────────────────────
-      } else {
-        const usuarios = Object.values(base)
-        respuesta += `📋 *Usuarios registrados (${usuarios.length}):*\n`
-        // Ordenar la lista alfabéticamente
-        const ordenados = usuarios.slice().sort((a, b) =>
-          a.nombreDado.localeCompare(b.nombreDado)
-        )
-        for (const u of ordenados) {
-          respuesta += `  • ${u.nombreDado}\n`
-        }
-        respuesta += `\n💡 Usa \`#listcuentas Nombre\` para ver el detalle de un usuario.`
+        return sock.sendMessage(chatId, { text: respuesta.trim() })
       }
 
-      await sock.sendMessage(chatId, { text: respuesta.trim() })
+      // Lista global
+      let respuesta = `📋 *Usuarios registrados (${todos.length}):*\n`
+      for (const u of todos) {
+        respuesta += `  • ${u.nombre_dado}\n`
+      }
+      respuesta += `\n💡 Usa \`#listcuentas Nombre\` para ver el detalle de un usuario.`
+
+      return sock.sendMessage(chatId, { text: respuesta.trim() })
 
     } catch (err) {
-      console.error('❌ [listcuentas] Error:', err)
-      await sock.sendMessage(chatId, {
-        text: '❌ Ocurrió un error al ejecutar el comando. Inténtalo de nuevo.'
-      })
+      console.error('❌ [listcuentas]:', err)
+      return sock.sendMessage(chatId, { text: '❌ Ocurrió un error. Inténtalo de nuevo.' })
     }
   }
 }

@@ -121,6 +121,9 @@ async function startTelegramBridge(sock) {
 
   console.log('✅ Telegram conectado')
 
+  // const sessionString = client.session.save()
+  // console.log('🔑 TELEGRAM_SESSION=', sessionString)
+
   client.addEventHandler(async (event) => {
     const message = event.message
     if (!message) return

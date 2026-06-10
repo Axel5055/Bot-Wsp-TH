@@ -17,7 +17,7 @@ module.exports = {
     }
 
     const lista = registros.map(r =>
-      `▫️ [ID: ${r.id}] *${r.nombre}* — ****${r.tag || r.numero.slice(-4)}`
+      `▫️ [ID: ${r.id}] *${r.nombre}* — +${r.numero || r.numero.slice(-4)}`
     ).join('\n')
 
     return await sock.sendMessage(chatId, {
