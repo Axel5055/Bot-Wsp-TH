@@ -1,6 +1,5 @@
 'use strict'
 
-// ─── Comando ──────────────────────────────────────────────────────────────────
 module.exports = {
   name: 'helpcuentas',
   admin: false,
@@ -14,14 +13,22 @@ module.exports = {
 ━━━━━━━━━━━━━━━━━━━━
 📌 *REGISTRAR CUENTAS*
 ━━━━━━━━━━━━━━━━━━━━
-🦊 \`#addcuentas Nombre ID1,ID2\`
-Registra tus cuentas con los IGG IDs.
+🦊 \`#addcuentas TuNombre\`
+Registro *automático* — el bot busca tu número en el Excel y registra todas tus cuentas de una vez. También registra tus escudos automáticamente.
+
+*Ejemplo:*
+\`#addcuentas Axel\`
+
+─────────────────────
+🦊 \`#addcuentas TuNombre ID1,ID2\`
+Registro *manual* — si tu número no está en el Excel, indica tus IGG IDs directamente.
 
 *Ejemplo:*
 \`#addcuentas Axel 123456789,987654321\`
 
-> Solo puedes tener un registro a tu nombre.
 > Los IDs deben existir en el Excel de Cacería.
+> Solo puedes tener un registro a tu nombre.
+> El registro automático también registra tus escudos.
 
 ━━━━━━━━━━━━━━━━━━━━
 📋 *VER USUARIOS*
@@ -49,17 +56,24 @@ Muestra el detalle de un usuario en concreto.
 🔄 *ACTUALIZAR NOMBRES*
 ━━━━━━━━━━━━━━━━━━━━
 🦊 \`#refreshcuentas TuNombre\`
-Sincroniza los nombres de tus cuentas con el Excel.
+Sincroniza los nombres de tus cuentas con el Excel de Cacería.
+Si algún nombre cambió en el Excel, se actualiza automáticamente tanto en multicuentas como en escudos.
 
 > Admins pueden omitir el nombre para actualizar todos.
 
 ━━━━━━━━━━━━━━━━━━━━
+📊 *REPORTE COMPLETO* _(Solo admins)_
+━━━━━━━━━━━━━━━━━━━━
+🦊 \`#reportecuentas\`
+Genera un reporte con todos los jugadores y sus cuentas ordenadas A-Z.
+
+━━━━━━━━━━━━━━━━━━━━
 ⚠️ *REGLAS*
 ━━━━━━━━━━━━━━━━━━━━
-• Los IDs deben existir en el Excel de Cacería.
-• No se permiten IDs duplicados entre usuarios.
-• Cada usuario solo puede tener un registro.
-• Solo admins pueden registrar/editar cuentas ajenas con @menciones.
+- Los IDs deben existir en el Excel de Cacería.
+- No se permiten IDs duplicados entre usuarios.
+- Cada usuario solo puede tener un registro.
+- Solo admins pueden registrar/editar cuentas ajenas con @menciones.
 
 🦊 Usa *#helpcuentas* para ver esta guía nuevamente.
 🅣🅗 — 🅑🅞🅣`

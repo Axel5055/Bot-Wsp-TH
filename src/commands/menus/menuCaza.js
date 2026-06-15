@@ -1,3 +1,4 @@
+// commands/menus/menuCaza.js
 module.exports = {
   name: 'mcaceria',
   admin: false,
@@ -5,31 +6,40 @@ module.exports = {
   execute: async (sock, msg) => {
     const chatId = msg.key.remoteJid
 
-    const texto = `*🦊 SoNy BOT 🦊*
+    const texto = `🦊 *SoNy BOT*
+━━━━━━━━━━━━━━━━━━━━━━━
+🏹 *MENÚ CACERÍA & REPORTES*
+━━━━━━━━━━━━━━━━━━━━━━━
 
-*📜 MENÚ CACERÍA*
+📖 *INFORMACIÓN*
+🏹 *#caza*                    → Reglas de cacería
+🎯 *#evento*                  → Evento mensual interno
 
-🦊 > *#caza*  → \`Reglas de Cacería\`  
-🦊 > *#evento*  → \`Evento Mensual Interno\`  
-🦊 > *#mobs*  → \`Menú de Mobs\`
-🦊 > *#stats [NickName]*    → \`Estadisticas de Cacería Individual\`
-🦊 > *#sgeneral* → \`Estadisticas de Cacería General de la semana\`
-🦊 > *#top10* → \`Top 10 de los Mejores Cazadores de la Semana\`
-🦊 > *#ranking* → \`Ranking de los Mejores Cazadores del Mes\`
-🦊 > *#smes* → \`Estadisticas Generales de Cacería del Mes\`
+━━━━━━━━━━━━━━━━━━━━━━━
+📊 *STATS SEMANALES*
+🔎 *#stats [Nick]*            → Perfil completo de un cazador
+📊 *#resumen*                 → Resumen general de la semana
+🏅 *#top10*                   → Top 10 cazadores de la semana
+❌ *#nocumplieron*            → Miembros que no alcanzaron la meta
+😴 *#inactivos*               → Miembros con 0 mobs esta semana
 
-🅣🅗 - 🅑🅞🅣
-`
+━━━━━━━━━━━━━━━━━━━━━━━
+🗓️ *STATS DEL MES*
+🏆 *#ranking*                 → Top 10 cazadores del mes
+📜 *#smes [Nick]*             → Historial mensual de un cazador
+
+━━━━━━━━━━━━━━━━━━━━━━━
+🐾 *#mobs*                    → Lista de mobs disponibles
+
+━━━━━━━━━━━━━━━━━━━━━━━
+💡 Usa *#menu* para ver todos los menús
+🅣🅗 — 🅑🅞🅣`
+
     try {
-      await sock.sendMessage(chatId, {
-        text: texto
-      })
+      await sock.sendMessage(chatId, { text: texto })
     } catch (error) {
-      console.error('❌ Error en comando #menu:', error)
-
-      await sock.sendMessage(chatId, {
-        text: '🚨 Ocurrió un error al mostrar el menú. Intenta más tarde.'
-      })
+      console.error('❌ Error en #mcaceria:', error)
+      await sock.sendMessage(chatId, { text: '🚨 Ocurrió un error al mostrar el menú. Intenta más tarde.' })
     }
   }
 }

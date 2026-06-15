@@ -1,10 +1,4 @@
 // commands/reports/buscar.js
-// Comando: #buscar <nombre>
-// Muestra el perfil completo de un miembro:
-//   - Estado de la semana actual (Stats)
-//   - Total acumulado del mes (Ranking Evento)
-// Ejemplo: #buscar ZOOMBI3XX
-
 const xlsx = require('xlsx')
 const { getSheet } = require('../../cache/excelCache')
 
@@ -47,13 +41,11 @@ module.exports = {
     const nombreBuscado = args.join(' ').trim()
 
     try {
-      await sock.sendMessage(chatId, {
-        react: { text: '🔎', key: msg.key },
-      })
+      await sock.sendMessage(chatId, { react: { text: '🔎', key: msg.key } })
 
       // ── Stats: semana actual ─────────────────────────────────────
       const sheetStats = getSheet(0)
-      const dataStats  = xlsx.utils.sheet_to_json(sheetStats)
+      const dataStats  = xlsx.utils.sheet_to_json(sheetStats, { range: 2 })
 
       const u = dataStats.find(
         r => normalizar(r['Nombre']) === normalizar(nombreBuscado)
@@ -72,28 +64,29 @@ module.exports = {
       const cumplio     = String(u['Status'] ?? '').trim() === 'Cumplio'
       const statusIcono = cumplio ? '✅' : '❌'
       const cuotaTipo   = String(u['Cuota'] ?? '').toLowerCase().includes('5lvl1') ? 'Nvl 1' : 'Nvl 2'
-      const fechaSemana = dataStats[0]['Fecha de Reporte'] || 'Semana actual'
+      const fechaSemana = dataStats.find(r => r['Fecha Reporte'])?.['Fecha Reporte'] || 'Semana actual'
       const leFaltan    = Math.max(0, META_SEMANAL - puntos)
 
-      // ── Ranking Evento: total del mes ────────────────────────────
-      const sheetRank = getSheet(3)
+      // ── Ranking Evento: total del mes (hoja índice 2) ────────────
+      const sheetRank = getSheet(2)
       const rawRank   = xlsx.utils.sheet_to_json(sheetRank, { header: 1 })
 
       const headerRank = rawRank[0]
       const idxTotal   = headerRank.findIndex(
         c => String(c ?? '').toLowerCase() === 'total'
       )
-      const mesNombre  = String(headerRank[headerRank.length - 1] ?? '')
+      // El mes está en la última columna con valor (col 10)
+      const mesNombre  = String(rawRank[1]?.[10] ?? '')
 
-      const filaRank   = rawRank.slice(1).find(
+      const filaRank = rawRank.slice(1).find(
         row => normalizar(row[2]) === normalizar(u['Nombre'])
       )
 
-      const totalMes   = filaRank && idxTotal !== -1
+      const totalMes = filaRank && idxTotal !== -1
         ? Number(filaRank[idxTotal] ?? 0)
         : null
 
-      const posicion   = filaRank ? Number(filaRank[0]) : null
+      const posicion = filaRank ? Number(filaRank[0]) : null
 
       // ── Construir mensaje ────────────────────────────────────────
       let txt = `🔎 *Perfil de Cazador*\n`
@@ -104,24 +97,19 @@ module.exports = {
       if (u['IGG ID']) txt += `🆔 IGG ID: \`${u['IGG ID']}\`\n`
       txt += `\n`
 
-      // Semana actual
       txt += `📅 *Semana actual* _(${fechaSemana})_\n`
       txt += `${statusIcono} Status: *${cumplio ? 'Cumplió' : 'No cumplió'}*\n`
       txt += `${barra(puntos)} *${puntos}/${META_SEMANAL}* pts\n`
-
-      if (!cumplio) {
-        txt += `⚠️ Le faltan *${leFaltan} pts* para cumplir\n`
-      }
-
+      if (!cumplio) txt += `⚠️ Le faltan *${leFaltan} pts* para cumplir\n`
       txt += `\n`
-      txt += `🏹 Mobs cazados: *${u['Total Semanal'] ?? 0}*\n`
+
+      txt += `🏹 Mobs cazados: *${Number(u['Total'] ?? 0)}*\n`
       txt += `🐰 L1: ${u['Total Mobs lvl 1'] ?? 0}  `
       txt += `🐺 L2: ${u['Total Mobs lvl 2'] ?? 0}  `
       txt += `🐲 L3: ${u['Total Mobs lvl 3'] ?? 0}\n`
       txt += `🐧 L4: ${u['Total Mobs lvl 4'] ?? 0}  `
       txt += `🐯 L5: ${u['Total Mobs lvl 5'] ?? 0}\n`
 
-      // Total del mes (si está en Ranking)
       if (totalMes !== null) {
         txt += `\n`
         txt += `🗓️ *Mes de ${mesNombre}*\n`

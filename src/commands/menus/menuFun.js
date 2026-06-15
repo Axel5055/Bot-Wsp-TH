@@ -1,6 +1,6 @@
-// commands/menus/menuMulticuentas.js
+// commands/menus/menuFun.js  ← NUEVO
 module.exports = {
-  name: 'mcuentas',
+  name: 'mfun',
   admin: false,
 
   execute: async (sock, msg) => {
@@ -8,25 +8,21 @@ module.exports = {
 
     const texto = `🦊 *SoNy BOT*
 ━━━━━━━━━━━━━━━━━━━━━━━
-👥 *MENÚ MULTICUENTAS*
+🎮 *MENÚ DIVERSIÓN*
 ━━━━━━━━━━━━━━━━━━━━━━━
 
-➕ *#addcuentas [Nick]*          → Registrar tus cuentas (auto desde Excel)
-✏️ *#editcuentas [Nick] [±IDs]*  → Agregar, quitar o reemplazar IDs
-📋 *#listcuentas*                → Ver todos los usuarios registrados
-📋 *#listcuentas [Nick]*         → Ver detalle de un usuario
-🔄 *#refreshcuentas [Nick]*      → Sincronizar nombres con el Excel
+💕 *#pareja*     → Descubre tu pareja del día
+🌈 *#topgay*     → Ranking gay del día
+🫂 *#caricias*   → Envía caricias a alguien
 
 ━━━━━━━━━━━━━━━━━━━━━━━
-📚 *#helpcuentas*                → Guía completa con ejemplos
-
 💡 Usa *#menu* para ver todos los menús
 🅣🅗 — 🅑🅞🅣`
 
     try {
       await sock.sendMessage(chatId, { text: texto })
     } catch (error) {
-      console.error('❌ Error en #mcuentas:', error)
+      console.error('❌ Error en #mfun:', error)
       await sock.sendMessage(chatId, { text: '🚨 Ocurrió un error al mostrar el menú. Intenta más tarde.' })
     }
   }

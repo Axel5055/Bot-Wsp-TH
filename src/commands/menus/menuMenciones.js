@@ -1,6 +1,6 @@
-// commands/menus/menuMulticuentas.js
+// commands/menus/menuMenciones.js
 module.exports = {
-  name: 'mcuentas',
+  name: 'mtodos',
   admin: false,
 
   execute: async (sock, msg) => {
@@ -8,25 +8,21 @@ module.exports = {
 
     const texto = `🦊 *SoNy BOT*
 ━━━━━━━━━━━━━━━━━━━━━━━
-👥 *MENÚ MULTICUENTAS*
+📢 *MENÚ MENCIONES*
 ━━━━━━━━━━━━━━━━━━━━━━━
 
-➕ *#addcuentas [Nick]*          → Registrar tus cuentas (auto desde Excel)
-✏️ *#editcuentas [Nick] [±IDs]*  → Agregar, quitar o reemplazar IDs
-📋 *#listcuentas*                → Ver todos los usuarios registrados
-📋 *#listcuentas [Nick]*         → Ver detalle de un usuario
-🔄 *#refreshcuentas [Nick]*      → Sincronizar nombres con el Excel
+📢 *#all*           → Mencionar a todos en el grupo
+💪 *#forta*         → Mencionar para fortalezas
+⚔️ *#rally*         → Mencionar para rallys
 
 ━━━━━━━━━━━━━━━━━━━━━━━
-📚 *#helpcuentas*                → Guía completa con ejemplos
-
 💡 Usa *#menu* para ver todos los menús
 🅣🅗 — 🅑🅞🅣`
 
     try {
       await sock.sendMessage(chatId, { text: texto })
     } catch (error) {
-      console.error('❌ Error en #mcuentas:', error)
+      console.error('❌ Error en #mtodos:', error)
       await sock.sendMessage(chatId, { text: '🚨 Ocurrió un error al mostrar el menú. Intenta más tarde.' })
     }
   }

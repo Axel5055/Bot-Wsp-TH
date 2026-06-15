@@ -22,25 +22,28 @@ module.exports = {
         return
       }
 
-      const data = xlsx.utils.sheet_to_json(sheet)
+      const data = xlsx.utils.sheet_to_json(sheet, { range: 2 })
       if (!data.length) {
         await sock.sendMessage(chatId, { text: '⚠️ No hay datos en la hoja de Top 10.' })
         return
       }
 
-      const fechaReporte = sheet['E2']?.v || moment().tz('America/Mexico_City').format('DD/MM/YYYY')
-      const top = data
-        .filter(u => u['Nombre'] && u['Nombre'] !== 'Total Semanal') // excluir fila de totales
-        .sort((a, b) => (b['Puntos Nvl 2'] || 0) - (a['Puntos Nvl 2'] || 0))
-        .slice(0, 10)
+      const fechaReporte = data.find(u => u['Fecha Reporte'])?.['Fecha Reporte']
+        || moment().tz('America/Mexico_City').format('DD/MM/YYYY')
+
       const medals = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟']
+
+      const top = data
+        .filter(u => u['Nombre'])
+        .sort((a, b) => Number(b['Puntos Nvl 2'] ?? 0) - Number(a['Puntos Nvl 2'] ?? 0))
+        .slice(0, 10)
 
       let txt = `━━━━━━━━━━━━━━━━━━━━━━━\n`
       txt    += `👏 *TOP 10 CAZADORES DE LA SEMANA*\n`
       txt    += `━━━━━━━━━━━━━━━━━━━━━━━\n`
 
       top.forEach((u, i) => {
-        txt += `${medals[i]} *${u.Nombre}* — ${u['Puntos Nvl 2'] || 0} pts | 🏹 ${u.Total || 0} mobs ${getRandomIcono()}\n`
+        txt += `${medals[i]} *${u['Nombre']}* — ${Number(u['Puntos Nvl 2'] ?? 0)} pts | 🏹 ${Number(u['Total'] ?? 0)} mobs ${getRandomIcono()}\n`
       })
 
       txt += `━━━━━━━━━━━━━━━━━━━━━━━\n`

@@ -33,17 +33,22 @@ module.exports = {
         return sock.sendMessage(chatId, { text: '⚠️ No se encontró la hoja *Stats* en el Excel.' })
       }
 
-      const stats = xlsx.utils.sheet_to_json(sheetStats)
+      // ── Leer totales globales de la fila 0 (antes de los encabezados) ──
+      const rawRows = xlsx.utils.sheet_to_json(sheetStats, { header: 1 })
+      // rawRows[0] = [null, null, null, 'Total Semanal', totalMobs, L1, L2, L3, L4, L5, ptsNvl2, ptsNvl1, debe]
+      const filaTotal = rawRows[0]
+      const totalMobsGlobal = Number(filaTotal[4] ?? 0)
+      const mobsL1Global    = Number(filaTotal[5] ?? 0)
+      const mobsL2Global    = Number(filaTotal[6] ?? 0)
+      const mobsL3Global    = Number(filaTotal[7] ?? 0)
+      const mobsL4Global    = Number(filaTotal[8] ?? 0)
+      const mobsL5Global    = Number(filaTotal[9] ?? 0)
+
+      // ── Leer filas de miembros (encabezado en fila 2, índice 2) ──
+      const stats = xlsx.utils.sheet_to_json(sheetStats, { range: 2 })
       if (!stats.length) {
         return sock.sendMessage(chatId, { text: '⚠️ La hoja *Stats* no tiene registros.' })
       }
-
-      const sheetTop = getSheet(1)
-      if (!sheetTop) {
-        return sock.sendMessage(chatId, { text: '⚠️ No se encontró la hoja *Top 10* en el Excel.' })
-      }
-
-      const topData = xlsx.utils.sheet_to_json(sheetTop)
 
       // ── Métricas ─────────────────────────────────────────────────
       const totalMemb    = stats.filter(u => u['Nombre']).length
@@ -51,26 +56,18 @@ module.exports = {
       const noCumplieron = totalMemb - cumplieron
       const pctCumplio   = ((cumplieron / totalMemb) * 100).toFixed(0)
 
-      const puntosLista  = stats.filter(u => u['Nombre']).map(getPuntos)
-      const puntosTotal  = puntosLista.reduce((a, b) => a + b, 0)
-      const promedio     = (puntosTotal / totalMemb).toFixed(1)
-      const maximo       = Math.max(...puntosLista)
+      const puntosLista = stats.filter(u => u['Nombre']).map(getPuntos)
+      const puntosTotal = puntosLista.reduce((a, b) => a + b, 0)
+      const promedio    = (puntosTotal / totalMemb).toFixed(1)
+      const maximo      = Math.max(...puntosLista)
 
-      const totalMobs = stats.reduce((a, u) => a + Number(u['Total Semanal']    ?? 0), 0)
-      const mobsL1    = stats.reduce((a, u) => a + Number(u['Total Mobs lvl 1'] ?? 0), 0)
-      const mobsL2    = stats.reduce((a, u) => a + Number(u['Total Mobs lvl 2'] ?? 0), 0)
-      const mobsL3    = stats.reduce((a, u) => a + Number(u['Total Mobs lvl 3'] ?? 0), 0)
-      const mobsL4    = stats.reduce((a, u) => a + Number(u['Total Mobs lvl 4'] ?? 0), 0)
-      const mobsL5    = stats.reduce((a, u) => a + Number(u['Total Mobs lvl 5'] ?? 0), 0)
+      const inactivos    = stats.filter(u => u['Nombre'] && Number(u['Total'] ?? 0) === 0)
+      const fechaReporte = stats.find(u => u['Fecha Reporte'])?.['Fecha Reporte'] || 'Semana actual'
 
-      const inactivos    = stats.filter(u => u['Nombre'] && Number(u['Total Semanal'] ?? 0) === 0)
-      const fechaReporte = stats[0]['Fecha de Reporte'] || 'Semana actual'
-
-      // ── Top 3 ordenado por Puntos Nvl 2 ─────────────────────────
-      // La hoja Top 10 NO viene ordenada; tomamos Stats directamente
+      // ── Top 3 por Puntos Nvl 2 ───────────────────────────────────
       const top3 = stats
         .filter(u => u['Nombre'] && String(u['Cuota'] ?? '').toLowerCase().includes('5lvl2'))
-        .sort((a, b) => (Number(b['Puntos Nvl 2'] ?? 0)) - (Number(a['Puntos Nvl 2'] ?? 0)))
+        .sort((a, b) => Number(b['Puntos Nvl 2'] ?? 0) - Number(a['Puntos Nvl 2'] ?? 0))
         .slice(0, 3)
 
       // ── Mensaje ──────────────────────────────────────────────────
@@ -79,9 +76,9 @@ module.exports = {
       txt    += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`
 
       txt    += `🏹 *Mobs cazados esta semana*\n`
-      txt    += `🔢 Total: *${totalMobs.toLocaleString()} mobs*\n`
-      txt    += `🐰 L1: ${mobsL1.toLocaleString()}  🐺 L2: ${mobsL2.toLocaleString()}  🐲 L3: ${mobsL3.toLocaleString()}\n`
-      txt    += `🐧 L4: ${mobsL4.toLocaleString()}  🐯 L5: ${mobsL5.toLocaleString()}\n\n`
+      txt    += `🔢 Total: *${totalMobsGlobal.toLocaleString()} mobs*\n`
+      txt    += `🐰 L1: ${mobsL1Global.toLocaleString()}  🐺 L2: ${mobsL2Global.toLocaleString()}  🐲 L3: ${mobsL3Global.toLocaleString()}\n`
+      txt    += `🐧 L4: ${mobsL4Global.toLocaleString()}  🐯 L5: ${mobsL5Global.toLocaleString()}\n\n`
 
       txt    += `⚔️ *Cumplimiento* _(meta: ${META_SEMANAL} pts)_\n`
       txt    += `${barraGrupo(cumplieron, totalMemb)} ${pctCumplio}%\n`
@@ -102,7 +99,7 @@ module.exports = {
         top3.forEach((u, i) => {
           const pts = Number(u['Puntos Nvl 2'] ?? 0)
           txt += `${MEDALLAS[i]} *${u['Nombre']}*\n`
-          txt += `   ⭐ ${pts} pts · 🏹 ${u['Total Semanal'] ?? 0} mobs\n`
+          txt += `   ⭐ ${pts} pts · 🏹 ${u['Total'] ?? 0} mobs\n`
         })
       }
 

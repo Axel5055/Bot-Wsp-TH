@@ -1,8 +1,4 @@
 // commands/reports/inactivos.js
-// Comando: #inactivos
-// Lista los miembros que tuvieron 0 mobs cazados en la semana actual.
-// Fuente: hoja "Stats" (índice 0)
-
 const xlsx = require('xlsx')
 const { getSheet } = require('../../cache/excelCache')
 
@@ -14,70 +10,47 @@ module.exports = {
     const chatId = msg.key.remoteJid
 
     try {
-      await sock.sendMessage(chatId, {
-        react: { text: '😴', key: msg.key },
-      })
+      await sock.sendMessage(chatId, { react: { text: '😴', key: msg.key } })
 
-      // ── Leer Stats ───────────────────────────────────────────────
       const sheet = getSheet(0)
       if (!sheet) {
-        return sock.sendMessage(chatId, {
-          text: '⚠️ No se encontró la hoja *Stats* en el Excel.',
-        })
+        return sock.sendMessage(chatId, { text: '⚠️ No se encontró la hoja *Stats* en el Excel.' })
       }
 
-      const data = xlsx.utils.sheet_to_json(sheet)
+      const data = xlsx.utils.sheet_to_json(sheet, { range: 2 })
       if (!data.length) {
-        return sock.sendMessage(chatId, {
-          text: '⚠️ La hoja *Stats* no tiene registros.',
-        })
+        return sock.sendMessage(chatId, { text: '⚠️ La hoja *Stats* no tiene registros.' })
       }
 
-      const fechaReporte = data[0]['Fecha de Reporte'] || 'Semana actual'
+      const fechaReporte = data.find(u => u['Fecha Reporte'])?.['Fecha Reporte'] || 'Semana actual'
       const totalMemb    = data.filter(u => u['Nombre']).length
+      const inactivos    = data.filter(u => u['Nombre'] && Number(u['Total'] ?? 0) === 0)
 
-      // Filtrar los que tienen exactamente 0 mobs
-      const inactivos = data.filter(
-        u => u['Nombre'] && Number(u['Total Semanal'] ?? 0) === 0
-      )
-
-      // ── Sin inactivos ────────────────────────────────────────────
-      if (inactivos.length === 0) {
+      if (!inactivos.length) {
         return sock.sendMessage(chatId, {
-          text:
-            `✅ *¡No hay inactivos esta semana!* 🎉\n\n` +
-            `📅 ${fechaReporte}\n` +
-            `👥 Todos los *${totalMemb}* miembros cazaron al menos 1 mob.\n\n` +
-            `🅣🅗 — 🅑🅞🅣`,
+          text: `✅ *¡No hay inactivos esta semana!* 🎉\n📅 ${fechaReporte}\n👥 Todos los *${totalMemb}* miembros cazaron al menos 1 mob.\n\n🅣🅗 — 🅑🅞🅣`,
         })
       }
 
-      // ── Construir mensaje ────────────────────────────────────────
       const pct = ((inactivos.length / totalMemb) * 100).toFixed(0)
 
-      let txt = `😴 *Miembros Inactivos esta semana*\n`
-      txt += `📅 *${fechaReporte}*\n`
-      txt += `─────────────────────────\n\n`
-      txt += `🚫 *${inactivos.length} de ${totalMemb}* miembros no cazaron nada (${pct}%)\n\n`
+      let txt = `😴 *Inactivos* — ${fechaReporte}\n`
+      txt    += `🚫 ${inactivos.length}/${totalMemb} miembros sin cazar (${pct}%)\n`
+      txt    += `━━━━━━━━━━━━━━━━━━━━━━━\n`
 
       inactivos.forEach((u, i) => {
-        const cuotaTipo = String(u['Cuota'] ?? '').toLowerCase().includes('5lvl1')
-          ? 'Nvl 1'
-          : 'Nvl 2'
-        txt += `${i + 1}. 💤 *${u['Nombre']}*  _(${cuotaTipo})_\n`
+        const cuota = String(u['Cuota'] ?? '').toLowerCase().includes('5lvl1') ? 'Nvl 1' : 'Nvl 2'
+        txt += `${i + 1}. 💤 *${u['Nombre']}* _(${cuota})_\n`
       })
 
-      txt += `\n─────────────────────────\n`
-      txt += `⚠️ Recuerda que 0 mobs = 0 puntos = *incumplimiento automático.*\n`
-      txt += `\n🅣🅗 — 🅑🅞🅣`
+      txt += `━━━━━━━━━━━━━━━━━━━━━━━\n`
+      txt += `🅣🅗 — 🅑🅞🅣`
 
       await sock.sendMessage(chatId, { text: txt })
 
     } catch (error) {
       console.error('❌ Error en #inactivos:', error)
-      await sock.sendMessage(chatId, {
-        text: '⚠️ Ocurrió un error al obtener los inactivos. Intenta más tarde.',
-      })
+      await sock.sendMessage(chatId, { text: '⚠️ Ocurrió un error al obtener los inactivos. Intenta más tarde.' })
     }
   },
 }

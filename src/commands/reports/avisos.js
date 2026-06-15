@@ -84,7 +84,7 @@ module.exports = {
         if (!u.Numero) { sinNumero++; continue }
 
         try {
-          const cuota = String(u['Cuota Diaria'] ?? '').toLowerCase()
+          const cuota = String(u['Cuota'] ?? '').toLowerCase()
           let tipo = 'General'
           let puntos = 0
 

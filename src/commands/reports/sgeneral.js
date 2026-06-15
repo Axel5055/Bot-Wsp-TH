@@ -9,7 +9,7 @@ module.exports = {
 
     try {
       // 🧠 Hoja desde cache (índice 2)
-      const sheet = getSheet(2)
+      const sheet = getSheet(0)
 
       if (!sheet) {
         await sock.sendMessage(chatId, {
@@ -18,11 +18,11 @@ module.exports = {
         return
       }
 
-      const total = sheet['E3']?.v || 0
-      const niveles = ['F3', 'G3', 'H3', 'I3', 'J3'].map(
+      const total = sheet['E1']?.v || 0
+      const niveles = ['F1', 'G1', 'H1', 'I1', 'J1'].map(
         c => sheet[c]?.v || 0
       )
-      const fecha = sheet['M1']?.v || 'Fecha desconocida'
+      const fecha = sheet['N4']?.v || 'Fecha desconocida'
 
       const txt = `👋 *¡Hola, cazadores!* 👋
 

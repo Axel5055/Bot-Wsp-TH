@@ -1,6 +1,5 @@
 module.exports = {
   name: 'helpescudos',
-  keywords: ['helpescudos'],
   admin: false,
   mensajero: false,
 
@@ -19,11 +18,17 @@ Recibe alertas por mensaje privado cuando tu escudo cae, y registra tu escudo ac
 ━━━━━━━━━━━━━━━━━━━━
 
 📝 *Registrarse*
-\`#addescudo NombreIngame, NumeroConLada\`
-_Puedes tener múltiples cuentas registradas. Cada cuenta tiene su propio ID._
+La forma más fácil es con *#addcuentas* — registra tus multicuentas y escudos en un solo comando:
+\`#addcuentas TuNombre\`
 
-Ejemplo:
-\`#addescudo SoNy, 5215512345678\`
+Si solo quieres registrar un escudo manualmente (cuando no estás en el Excel):
+\`#addescudo NombreIngame, IGG_ID\`
+_Si tu número tampoco está en el Excel:_
+\`#addescudo NombreIngame, IGG_ID, NumeroConLada\`
+
+Ejemplos:
+\`#addescudo SoNy, 416845218\`
+\`#addescudo SoNy, 416845218, 5215512345678\`
 
 ⚠️ El número debe incluir la lada de tu país *sin el +*
 🇲🇽 México → 521XXXXXXXXXX
@@ -71,7 +76,7 @@ _Si tienes una sola cuenta._
 _Si tienes varias cuentas, especifica a cuál._
 
 Escudos disponibles:
-• *4h* • *8h* • *12h* • *24h* • *3d* • *7d* • *14d*
+- *4h* • *8h* • *12h* • *24h* • *3d* • *7d* • *14d*
 
 Ejemplos:
 \`#ponescudo 8h\`
@@ -94,17 +99,20 @@ Ejemplos:
 ─────────────────────
 📋 *Ver jugadores registrados*
 \`#listescudos\`
-_Muestra todos los registros con su ID y tag._
+_Muestra todos los registros con su estado de escudo._
+
+\`#listescudos Nombre\`
+_Filtra por nombre._
 
 ━━━━━━━━━━━━━━━━━━━━
 🔑 *COMANDOS EXCLUSIVOS PARA ADMINS*
 ━━━━━━━━━━━━━━━━━━━━
 
-➕ *Registrar a otro usuario*
-\`#addescudo NombreIngame, Numero, @usuario\`
+➕ *Registrar a otro usuario manualmente*
+\`#addescudo NombreIngame, IGG_ID, @usuario\`
 
 Ejemplo:
-\`#addescudo SoNy, 5215512345678, @usuario\`
+\`#addescudo SoNy, 416845218, @usuario\`
 
 ─────────────────────
 ✏️ *Editar registro de cualquier usuario*

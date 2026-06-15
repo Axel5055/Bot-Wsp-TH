@@ -1,6 +1,4 @@
 // src/database/excel.js
-// Fuente de verdad del Excel — todos los módulos leen desde aquí
-
 const XLSX = require('xlsx')
 const path = require('path')
 
@@ -8,10 +6,6 @@ const EXCEL_PATH = process.env.EXCEL_PATH
   ? path.join(process.cwd(), process.env.EXCEL_PATH)
   : path.join(__dirname, '../../media/excel/caza.xlsx')
 
-// ─────────────────────────────────────────────
-// Leer hoja Caza — devuelve array de { igg_id, nombre }
-// Datos desde fila 5, col C = IGG ID, col D = Nombre
-// ─────────────────────────────────────────────
 function leerCaza() {
   try {
     const wb = XLSX.readFile(EXCEL_PATH)
@@ -21,14 +15,12 @@ function leerCaza() {
       return []
     }
 
-    // Leer con encabezados de fila 1, sin range
-    const filas = XLSX.utils.sheet_to_json(ws, { defval: '' })
+    const filas = XLSX.utils.sheet_to_json(ws, { range: 2, defval: '' })
 
     return filas
       .filter(f => {
         const id = f['IGG ID']
-        // Solo filas donde IGG ID sea un número válido
-        return id && !isNaN(Number(id)) && String(id).trim() !== ''
+        return id && !isNaN(Number(id)) && String(id).trim() !== '' && Number(id) !== 0
       })
       .map(f => ({
         igg_id: String(f['IGG ID']).trim(),
@@ -42,31 +34,25 @@ function leerCaza() {
   }
 }
 
-// ─────────────────────────────────────────────
-// Leer hoja Numeros — devuelve array de { igg_id, nombre, numero }
-// Datos desde fila 2, col A = IGG ID, col B = Nombre, col C = Numero
-// ─────────────────────────────────────────────
 function leerNumeros() {
   try {
-    const wb      = XLSX.readFile(EXCEL_PATH)
-    const wsNum   = wb.Sheets['Numeros']
-    const wsCaza  = wb.Sheets['Caza']
+    const wb     = XLSX.readFile(EXCEL_PATH)
+    const wsNum  = wb.Sheets['Numeros']
+    const wsCaza = wb.Sheets['Caza']
     if (!wsNum || !wsCaza) {
       console.error('[excel] ❌ Hoja Numeros o Caza no encontrada')
       return []
     }
 
-    // Leer Caza para resolver nombres por IGG ID
-    const filasC = XLSX.utils.sheet_to_json(wsCaza, { defval: '' })
+    const filasC = XLSX.utils.sheet_to_json(wsCaza, { range: 2, defval: '' })
     const mapaNombres = {}
     for (const f of filasC) {
       const id = f['IGG ID']
-      if (id && !isNaN(Number(id))) {
+      if (id && !isNaN(Number(id)) && Number(id) !== 0) {
         mapaNombres[String(id).trim()] = String(f['Nombre']).trim()
       }
     }
 
-    // Leer Numeros — solo IGG ID y Numero (ignorar Nombre porque es fórmula)
     const filasN = XLSX.utils.sheet_to_json(wsNum, { defval: '' })
 
     return filasN
@@ -85,18 +71,11 @@ function leerNumeros() {
   }
 }
 
-// ─────────────────────────────────────────────
-// Buscar en Caza por IGG ID
-// ─────────────────────────────────────────────
 function buscarEnCazaPorId(igg_id) {
   const caza = leerCaza()
   return caza.find(f => f.igg_id === String(igg_id).trim()) || null
 }
 
-// ─────────────────────────────────────────────
-// Buscar en Numeros por número de teléfono
-// Tolerante a diferencias de lada (compara por sufijo)
-// ─────────────────────────────────────────────
 function buscarEnNumerosPorTelefono(numero) {
   const numeros = leerNumeros()
   const limpio  = String(numero).replace(/\D/g, '')
@@ -108,9 +87,6 @@ function buscarEnNumerosPorTelefono(numero) {
   })
 }
 
-// ─────────────────────────────────────────────
-// Buscar en Numeros por IGG ID
-// ─────────────────────────────────────────────
 function buscarEnNumerosPorId(igg_id) {
   const numeros = leerNumeros()
   return numeros.find(f => f.igg_id === String(igg_id).trim()) || null

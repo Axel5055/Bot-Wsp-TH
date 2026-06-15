@@ -1,3 +1,4 @@
+// commands/menus/menuGeneral.js
 module.exports = {
   name: 'mgeneral',
   admin: false,
@@ -5,27 +6,27 @@ module.exports = {
   execute: async (sock, msg) => {
     const chatId = msg.key.remoteJid
 
-    const texto = `*🦊 SoNy BOT 🦊*
+    const texto = `🦊 *SoNy BOT*
+━━━━━━━━━━━━━━━━━━━━━━━
+🗂️ *MENÚ GENERAL*
+━━━━━━━━━━━━━━━━━━━━━━━
 
-*📜 MENÚ GENERAL*
+📜 *#reglas*           → Reglas del gremio y grupo
+🏹 *#caza*             → Reglas de cacería semanal
+🎯 *#evento*           → Evento interno del mes
+📅 *#calendario*       → Calendario de eventos 2026
+🕐 *#hora [país]*      → Hora actual de cualquier país LATAM
+🔍 *#kinfo [reino]*    → Info general de un reino
 
-🦊 > *#reglas*  → \`Reglas del Grupo y Gremio\`  
-🦊 > *#kinfo [reino]*  → \`Obten información General de un Reino\`
-🦊 > *#calendario*  → \`Calendario de eventos de todo 2026\`
-🦊 > *#formaciones*  → \`Formaciones para WOW\`
+━━━━━━━━━━━━━━━━━━━━━━━
+💡 Usa *#menu* para ver todos los menús
+🅣🅗 — 🅑🅞🅣`
 
-🅣🅗 - 🅑🅞🅣
-`
     try {
-      await sock.sendMessage(chatId, {
-        text: texto
-      })
+      await sock.sendMessage(chatId, { text: texto })
     } catch (error) {
-      console.error('❌ Error en comando #menu:', error)
-
-      await sock.sendMessage(chatId, {
-        text: '🚨 Ocurrió un error al mostrar el menú. Intenta más tarde.'
-      })
+      console.error('❌ Error en #mgeneral:', error)
+      await sock.sendMessage(chatId, { text: '🚨 Ocurrió un error al mostrar el menú. Intenta más tarde.' })
     }
   }
 }
